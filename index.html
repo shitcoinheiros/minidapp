@@ -360,27 +360,23 @@
       loadData();
       
       // Inicializa o TON Connect UI
+      // Use o URL do manifesto do seu projeto.
       const tonConnectUI = new TonConnectUI.TonConnectUI({
         manifestUrl: 'https://raw.githubusercontent.com/ton-community/ton-connect-manifests/main/mini-app-manifest.json',
-        actionsConfiguration: {
-          twaReturnUrl: 'https://t.me/your_bot_name/your_web_app' // Substitua pelo link do seu bot/app
-        }
       });
 
       // Adiciona a funcionalidade de conexão da carteira ao botão
       connectWalletBtn.addEventListener('click', () => {
-        tonConnectUI.openModal();
+        try {
+          tonConnectUI.openModal();
+        } catch (error) {
+          console.error("Erro ao tentar abrir o modal da TON Connect:", error);
+          showModal('Erro de Conexão', 'Não foi possível conectar à carteira. Tente novamente mais tarde.');
+        }
       });
-
+      
       // Acompanha a mudança de status da carteira
       tonConnectUI.onStatusChange(wallet => {
-        if (wallet) {
-          console.log("Carteira conectada:", wallet.account.address);
-          showModal('Conexão de Carteira', `Sua carteira ${wallet.account.address.substring(0, 4)}...${wallet.account.address.substring(wallet.account.address.length - 4)} foi conectada com sucesso!`);
-        } else {
-          console.log("Carteira desconectada.");
-          showModal('Carteira Desconectada', 'Sua carteira foi desconectada.');
-        }
         renderWalletStatus(wallet);
       });
       
