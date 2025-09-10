@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hamster Kombat</title>
+    <title>Hamster Kombat - TON</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- TON Connect SDK -->
+    <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
     <style>
         :root {
             --primary-gold: #FFD700;
@@ -15,6 +17,7 @@
             --text-gray: #AAAAAA;
             --energy-red: #FF4757;
             --boost-green: #2ED573;
+            --ton-blue: #0088CC;
         }
         
         * {
@@ -80,7 +83,7 @@
         }
         
         .wallet-btn {
-            background: linear-gradient(to right, #0088CC, #005F8B);
+            background: linear-gradient(to right, var(--ton-blue), #005F8B);
             color: white;
             border: none;
             padding: 8px 16px;
@@ -95,17 +98,38 @@
         
         .wallet-connected {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
             background: rgba(0, 136, 204, 0.2);
             padding: 8px 12px;
-            border-radius: 20px;
+            border-radius: 12px;
             font-size: 0.9rem;
         }
         
         .wallet-address {
             font-size: 0.8rem;
             color: var(--text-gray);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .wallet-balance {
+            font-size: 0.9rem;
+            color: var(--primary-gold);
+            font-weight: 600;
+        }
+        
+        .disconnect-btn {
+            background: transparent;
+            color: var(--text-gray);
+            border: 1px solid var(--text-gray);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            margin-top: 5px;
         }
         
         .main-content {
@@ -324,6 +348,78 @@
             opacity: 1;
         }
         
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--primary-gold);
+        }
+        
+        .modal-text {
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .modal-btn-primary {
+            background: var(--ton-blue);
+            color: white;
+        }
+        
+        .modal-btn-secondary {
+            background: transparent;
+            color: var(--text-gray);
+            border: 1px solid var(--text-gray);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--ton-blue);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
         @media (max-width: 480px) {
             .actions-grid, .boosters-grid {
                 grid-template-columns: 1fr;
@@ -336,6 +432,17 @@
             .hamster-container {
                 width: 120px;
                 height: 120px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .wallet-section {
+                width: 100%;
+                justify-content: flex-end;
             }
         }
         
@@ -372,8 +479,14 @@
             </div>
             <div class="wallet-section">
                 <div id="walletInfo" class="wallet-connected" style="display: none;">
-                    <span>✅</span>
-                    <span>Conectado</span>
+                    <div class="wallet-address">
+                        <span>✅</span>
+                        <span id="walletShortAddress"></span>
+                    </div>
+                    <div class="wallet-balance">
+                        <span id="tonBalance">0 TON</span>
+                    </div>
+                    <button id="disconnectBtn" class="disconnect-btn">Desconectar</button>
                 </div>
                 <button id="connectBtn" class="wallet-btn">
                     <span>🔗</span>
@@ -440,6 +553,18 @@
         <span>✅</span>
         <span id="notificationText"></span>
     </div>
+    
+    <div id="connectModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Conectar Carteira</h2>
+            <p class="modal-text">Escolha como deseja conectar sua carteira TON:</p>
+            <div class="modal-buttons">
+                <button id="connectTelegramBtn" class="modal-btn modal-btn-primary">Telegram Wallet</button>
+                <button id="connectTonkeeperBtn" class="modal-btn">Tonkeeper</button>
+            </div>
+            <button id="closeModalBtn" class="modal-btn modal-btn-secondary" style="margin-top: 15px;">Fechar</button>
+        </div>
+    </div>
 
     <script>
         // Inicializar a Telegram Web App
@@ -447,9 +572,16 @@
         tg.expand();
         tg.enableClosingConfirmation();
         
+        // Inicializar TON Connect
+        let tonConnectUI = null;
+        let tonConnect = null;
+        
         // Elementos DOM
         const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
         const walletInfo = document.getElementById('walletInfo');
+        const walletShortAddress = document.getElementById('walletShortAddress');
+        const tonBalance = document.getElementById('tonBalance');
         const scoreValue = document.getElementById('scoreValue');
         const perSecondValue = document.getElementById('perSecondValue');
         const hamster = document.getElementById('hamster');
@@ -460,6 +592,10 @@
         const booster2 = document.getElementById('booster2');
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notificationText');
+        const connectModal = document.getElementById('connectModal');
+        const connectTelegramBtn = document.getElementById('connectTelegramBtn');
+        const connectTonkeeperBtn = document.getElementById('connectTonkeeperBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
         
         // Estado do jogo
         let score = 0;
@@ -470,13 +606,164 @@
         let rechargeRate = 1;
         let walletConnected = false;
         let walletAddress = "";
+        let userBalance = 0;
         
         // Boosters
         let tapBoostLevel = 1;
         let energyBoostLevel = 1;
         
-        // Verificar se já temos uma carteira conectada (em localStorage)
+        // Inicializar TON Connect
+        async function initTonConnect() {
+            try {
+                // Em produção, use o manifest URL do seu projeto
+                const manifestUrl = 'https://yourdomain.com/tonconnect-manifest.json';
+                
+                // Inicializar TON Connect UI
+                tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+                    manifestUrl: manifestUrl,
+                    buttonRootId: 'connect-btn-root'
+                });
+                
+                // Verificar se já está conectado
+                const connected = tonConnectUI.connected;
+                if (connected) {
+                    walletAddress = connected.account.address;
+                    walletConnected = true;
+                    updateWalletUI();
+                    await getWalletBalance();
+                }
+                
+            } catch (error) {
+                console.error('Erro ao inicializar TON Connect:', error);
+                showNotification('Erro ao conectar com a carteira');
+            }
+        }
+        
+        // Conectar com Telegram Wallet
+        async function connectTelegramWallet() {
+            try {
+                hideModal();
+                showNotification('Conectando com Telegram Wallet...');
+                
+                // Aqui viria a integração real com a Telegram Wallet API
+                // Por enquanto, vamos simular uma conexão bem-sucedida
+                
+                // Simular endereço da carteira (em produção, viria da API real)
+                const mockWallet = {
+                    address: 'EQ' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+                    provider: 'Telegram Wallet'
+                };
+                
+                // Simular tempo de conexão
+                setTimeout(() => {
+                    connectWallet(mockWallet);
+                    showNotification('Carteira conectada com sucesso!');
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Erro ao conectar com Telegram Wallet:', error);
+                showNotification('Erro ao conectar com Telegram Wallet');
+            }
+        }
+        
+        // Conectar com Tonkeeper
+        async function connectTonkeeper() {
+            try {
+                hideModal();
+                showNotification('Conectando com Tonkeeper...');
+                
+                // Em produção, isso usaria o TON Connect para conectar com Tonkeeper
+                // Por enquanto, vamos simular uma conexão bem-sucedida
+                
+                // Simular endereço da carteira (em produção, viria da API real)
+                const mockWallet = {
+                    address: 'EQ' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+                    provider: 'Tonkeeper'
+                };
+                
+                // Simular tempo de conexão
+                setTimeout(() => {
+                    connectWallet(mockWallet);
+                    showNotification('Carteira conectada com sucesso!');
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Erro ao conectar com Tonkeeper:', error);
+                showNotification('Erro ao conectar com Tonkeeper');
+            }
+        }
+        
+        // Obter saldo da carteira
+        async function getWalletBalance() {
+            try {
+                // Em produção, isso buscaria o saldo real da blockchain TON
+                // Por enquanto, vamos simular um saldo
+                userBalance = Math.random() * 10;
+                tonBalance.textContent = userBalance.toFixed(2) + ' TON';
+                
+            } catch (error) {
+                console.error('Erro ao obter saldo:', error);
+                tonBalance.textContent = 'Erro ao carregar';
+            }
+        }
+        
+        // Conectar carteira
+        function connectWallet(walletData) {
+            walletConnected = true;
+            walletAddress = walletData.address;
+            
+            // Atualizar UI
+            updateWalletUI();
+            
+            // Salvar dados
+            saveGameData();
+        }
+        
+        // Desconectar carteira
+        function disconnectWallet() {
+            walletConnected = false;
+            walletAddress = "";
+            
+            // Atualizar UI
+            connectBtn.style.display = 'flex';
+            walletInfo.style.display = 'none';
+            
+            // Salvar dados
+            saveGameData();
+            
+            showNotification('Carteira desconectada');
+        }
+        
+        // Atualizar UI da carteira
+        function updateWalletUI() {
+            connectBtn.style.display = 'none';
+            walletInfo.style.display = 'flex';
+            
+            // Formatar endereço para exibição (primeiros e últimos 4 caracteres)
+            const start = walletAddress.substring(0, 4);
+            const end = walletAddress.substring(walletAddress.length - 4);
+            walletShortAddress.textContent = `${start}...${end}`;
+            
+            // Atualizar saldo
+            getWalletBalance();
+        }
+        
+        // Mostrar modal de conexão
+        function showModal() {
+            connectModal.style.display = 'flex';
+        }
+        
+        // Ocultar modal de conexão
+        function hideModal() {
+            connectModal.style.display = 'none';
+        }
+        
+        // Event listeners
         window.addEventListener('DOMContentLoaded', () => {
+            // Inicializar TON Connect
+            initTonConnect();
+            
+            // Carregar dados salvos
             const savedData = localStorage.getItem('hamsterKombatData');
             if (savedData) {
                 const data = JSON.parse(savedData);
@@ -493,8 +780,7 @@
                 updateUI();
                 
                 if (walletConnected) {
-                    connectBtn.style.display = 'none';
-                    walletInfo.style.display = 'flex';
+                    updateWalletUI();
                 }
             }
             
@@ -504,20 +790,28 @@
         });
         
         // Conectar carteira
-        connectBtn.addEventListener('click', () => {
-            // Simulação da conexão com a carteira do Telegram
-            // Em um app real, isso usaria a TON Connect ou similar
-            const mockWallet = {
-                address: 'EQ' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
-                provider: 'Telegram Wallet'
-            };
-            
-            connectWallet(mockWallet);
-            showNotification('Carteira conectada com sucesso!');
-        });
+        connectBtn.addEventListener('click', showModal);
+        
+        // Desconectar carteira
+        disconnectBtn.addEventListener('click', disconnectWallet);
+        
+        // Conectar com Telegram Wallet
+        connectTelegramBtn.addEventListener('click', connectTelegramWallet);
+        
+        // Conectar com Tonkeeper
+        connectTonkeeperBtn.addEventListener('click', connectTonkeeper);
+        
+        // Fechar modal
+        closeModalBtn.addEventListener('click', hideModal);
         
         // Clique no hamster
         hamster.addEventListener('click', () => {
+            if (!walletConnected) {
+                showNotification('Conecte sua carteira primeiro!');
+                showModal();
+                return;
+            }
+            
             if (energy >= 10) {
                 // Criar animação de moeda
                 const coin = document.createElement('div');
@@ -548,6 +842,12 @@
         
         // Recarregar energia
         rechargeAction.addEventListener('click', () => {
+            if (!walletConnected) {
+                showNotification('Conecte sua carteira primeiro!');
+                showModal();
+                return;
+            }
+            
             if (score >= rechargeCost) {
                 score -= rechargeCost;
                 energy = Math.min(100, energy + 30);
@@ -561,6 +861,12 @@
         
         // Comprar booster 1 (Tap Melhorado)
         booster1.addEventListener('click', () => {
+            if (!walletConnected) {
+                showNotification('Conecte sua carteira primeiro!');
+                showModal();
+                return;
+            }
+            
             const cost = 100 * tapBoostLevel;
             if (score >= cost) {
                 score -= cost;
@@ -576,6 +882,12 @@
         
         // Comprar booster 2 (Energia Pro)
         booster2.addEventListener('click', () => {
+            if (!walletConnected) {
+                showNotification('Conecte sua carteira primeiro!');
+                showModal();
+                return;
+            }
+            
             const cost = 150 * energyBoostLevel;
             if (score >= cost) {
                 score -= cost;
@@ -589,22 +901,9 @@
             }
         });
         
-        // Função para conectar carteira
-        function connectWallet(walletData) {
-            walletConnected = true;
-            walletAddress = walletData.address;
-            
-            // Atualizar UI
-            connectBtn.style.display = 'none';
-            walletInfo.style.display = 'flex';
-            
-            // Salvar dados
-            saveGameData();
-        }
-        
         // Ganho passivo de moedas
         function passiveIncome() {
-            if (perSecond > 0) {
+            if (perSecond > 0 && walletConnected) {
                 addScore(perSecond);
             }
         }
