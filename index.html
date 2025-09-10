@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Combat</title>
+    <title>Hamster Kombat</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --primary-color: #0088cc;
-            --secondary-color: #ff9966;
-            --dark-color: #333;
-            --light-color: #f4f4f4;
-            --success-color: #28a745;
+            --primary-gold: #FFD700;
+            --secondary-gold: #D4AF37;
+            --dark-bg: #1A1A1A;
+            --card-bg: #252525;
+            --text-light: #FFFFFF;
+            --text-gray: #AAAAAA;
+            --energy-red: #FF4757;
+            --boost-green: #2ED573;
         }
         
         * {
@@ -22,215 +25,421 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            color: var(--light-color);
+            background: var(--dark-bg);
+            color: var(--text-light);
             min-height: 100vh;
-            padding: 20px;
+            padding: 16px;
+            background-image: radial-gradient(circle at 15% 50%, #2A2A2A, #1A1A1A);
         }
         
         .container {
-            max-width: 500px;
+            max-width: 100%;
             margin: 0 auto;
-            padding: 20px;
         }
         
         header {
-            text-align: center;
-            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .logo {
-            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: bold;
-            color: var(--secondary-color);
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: 20px;
+            color: #000;
         }
         
-        .subtitle {
-            font-size: 1rem;
-            opacity: 0.8;
-        }
-        
-        .card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(to right, var(--primary-gold), var(--secondary-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
         .wallet-section {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
         }
         
-        .wallet-info {
-            display: none;
-            text-align: center;
-            width: 100%;
+        .wallet-btn {
+            background: linear-gradient(to right, #0088CC, #005F8B);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .wallet-connected {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 136, 204, 0.2);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
         }
         
         .wallet-address {
             font-size: 0.8rem;
-            word-break: break-all;
-            margin: 10px 0;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 8px;
-            border-radius: 8px;
+            color: var(--text-gray);
         }
         
-        .btn {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 100%;
-            font-size: 1rem;
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
         
-        .btn:hover {
-            background: #006ba1;
-            transform: translateY(-2px);
-        }
-        
-        .btn-secondary {
-            background: var(--secondary-color);
-        }
-        
-        .btn-secondary:hover {
-            background: #e07c4b;
-        }
-        
-        .game-area {
+        .score-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
             text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.2);
         }
         
-        .character {
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 20px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="40" r="30" fill="%23ff9966"/><circle cx="50" cy="40" r="20" fill="%23ffcc99"/><circle cx="40" cy="35" r="5" fill="%23333"/><circle cx="60" cy="35" r="5" fill="%23333"/><path d="M45 55 Q50 60 55 55" stroke="%23333" stroke-width="2" fill="none"/></svg>') no-repeat center;
-            background-size: contain;
-        }
-        
-        .score-display {
-            font-size: 1.5rem;
-            margin: 15px 0;
+        .score-label {
+            font-size: 1rem;
+            color: var(--text-gray);
+            margin-bottom: 5px;
         }
         
         .score-value {
+            font-size: 2.5rem;
             font-weight: bold;
-            color: var(--secondary-color);
+            background: linear-gradient(to right, var(--primary-gold), var(--secondary-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
         }
         
-        .actions {
+        .score-per-second {
+            font-size: 0.9rem;
+            color: var(--text-gray);
             display: flex;
-            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .hamster-area {
+            position: relative;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .hamster-container {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .hamster {
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="40" r="30" fill="%23FFD700"/><circle cx="50" cy="40" r="20" fill="%23FFED85"/><circle cx="40" cy="35" r="5" fill="%23333"/><circle cx="60" cy="35" r="5" fill="%23333"/><path d="M45 55 Q50 60 55 55" stroke="%23333" stroke-width="2" fill="none"/><ellipse cx="50" cy="75" rx="20" ry="15" fill="%23FFD700"/><rect x="30" y="70" width="40" height="10" fill="%23FFD700"/></svg>') no-repeat center;
+            background-size: contain;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        
+        .hamster:active {
+            transform: scale(0.95);
+        }
+        
+        .energy-bar {
+            width: 80%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .energy-fill {
+            height: 100%;
+            background: var(--energy-red);
+            border-radius: 5px;
+            width: 70%;
+            transition: width 0.3s;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
             margin-top: 20px;
         }
         
-        .actions .btn {
-            width: auto;
-            flex: 1;
-        }
-        
-        .history {
-            margin-top: 30px;
-        }
-        
-        .history-title {
-            margin-bottom: 10px;
-            font-size: 1.2rem;
-        }
-        
-        .history-list {
-            list-style: none;
-        }
-        
-        .history-item {
-            padding: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .action-btn {
+            background: linear-gradient(to bottom, #3A3A3A, #2A2A2A);
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text-light);
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .action-name {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .action-desc {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+        }
+        
+        .action-value {
+            font-size: 0.9rem;
+            color: var(--primary-gold);
+            margin-top: 5px;
+        }
+        
+        .boosters-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .boosters-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .booster-card {
+            background: linear-gradient(to bottom, #3A3A3A, #2A2A2A);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        
+        .booster-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-gold);
+        }
+        
+        .booster-desc {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+        }
+        
+        .booster-cost {
+            font-size: 0.9rem;
+            color: var(--boost-green);
+            margin-top: 5px;
+        }
+        
+        .booster-btn {
+            background: linear-gradient(to right, var(--primary-gold), var(--secondary-gold));
+            color: #000;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 5px;
+            font-size: 0.9rem;
         }
         
         .notification {
             position: fixed;
-            top: 20px;
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--success-color);
+            background: rgba(0, 0, 0, 0.8);
             color: white;
-            padding: 10px 20px;
+            padding: 12px 20px;
             border-radius: 50px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             z-index: 1000;
             opacity: 0;
             transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .show {
+        .notification.show {
             opacity: 1;
         }
         
         @media (max-width: 480px) {
-            .container {
-                padding: 10px;
+            .actions-grid, .boosters-grid {
+                grid-template-columns: 1fr;
             }
             
-            .logo {
+            .score-value {
                 font-size: 2rem;
             }
             
-            .character {
+            .hamster-container {
                 width: 120px;
                 height: 120px;
             }
+        }
+        
+        .pulse {
+            animation: pulse-animation 0.5s;
+        }
+        
+        @keyframes pulse-animation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .coin-animation {
+            position: absolute;
+            font-size: 1.5rem;
+            opacity: 0;
+            pointer-events: none;
+            animation: coin-float 1s forwards;
+        }
+        
+        @keyframes coin-float {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-50px); opacity: 0; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div class="logo">🐹 Telegram Combat</div>
-            <div class="subtitle">Conecte sua carteira e acumule pontos!</div>
+            <div class="logo">
+                <div class="logo-icon">🐹</div>
+                <div class="logo-text">Hamster Kombat</div>
+            </div>
+            <div class="wallet-section">
+                <div id="walletInfo" class="wallet-connected" style="display: none;">
+                    <span>✅</span>
+                    <span>Conectado</span>
+                </div>
+                <button id="connectBtn" class="wallet-btn">
+                    <span>🔗</span>
+                    Conectar Carteira
+                </button>
+            </div>
         </header>
         
-        <div class="card wallet-section">
-            <div id="walletInfo" class="wallet-info">
-                <h3>Carteira Conectada</h3>
-                <p id="walletAddress" class="wallet-address"></p>
-                <button id="disconnectBtn" class="btn btn-secondary">Desconectar</button>
+        <div class="main-content">
+            <div class="score-card">
+                <div class="score-label">Saldo de Moedas</div>
+                <div id="scoreValue" class="score-value">0</div>
+                <div class="score-per-second">
+                    <span>⏱</span>
+                    <span id="perSecondValue">0</span> por segundo
+                </div>
             </div>
-            <button id="connectBtn" class="btn">Conectar Carteira Telegram</button>
-        </div>
-        
-        <div id="gameSection" class="card game-area" style="display: none;">
-            <div class="character" id="character"></div>
-            <div class="score-display">
-                Pontuação: <span id="scoreValue" class="score-value">0</span>
+            
+            <div class="hamster-area">
+                <div class="hamster-container">
+                    <div id="hamster" class="hamster"></div>
+                    <div class="energy-bar">
+                        <div id="energyFill" class="energy-fill"></div>
+                    </div>
+                </div>
+                <div class="actions-grid">
+                    <button class="action-btn" id="tapAction">
+                        <span class="action-name">Tap</span>
+                        <span class="action-desc">Clique no hamster para ganhar moedas</span>
+                        <span class="action-value">+5 moedas</span>
+                    </button>
+                    <button class="action-btn" id="rechargeAction">
+                        <span class="action-name">Recarregar</span>
+                        <span class="action-desc">Recupere energia mais rapidamente</span>
+                        <span class="action-value">-10 moedas</span>
+                    </button>
+                </div>
             </div>
-            <div class="actions">
-                <button id="attackBtn" class="btn">⚔️ Atacar</button>
-                <button id="specialBtn" class="btn btn-secondary">✨ Especial</button>
+            
+            <div class="boosters-section">
+                <div class="section-title">
+                    <span>🚀</span>
+                    <span>Impulsionadores</span>
+                </div>
+                <div class="boosters-grid">
+                    <div class="booster-card">
+                        <span class="booster-name">Tap Melhorado</span>
+                        <span class="booster-desc">Dobra os ganhos por clique</span>
+                        <span class="booster-cost">Custo: 100 moedas</span>
+                        <button class="booster-btn" id="booster1">Comprar</button>
+                    </div>
+                    <div class="booster-card">
+                        <span class="booster-name">Energia Pro</span>
+                        <span class="booster-desc">Recarrega 50% mais rápido</span>
+                        <span class="booster-cost">Custo: 150 moedas</span>
+                        <button class="booster-btn" id="booster2">Comprar</button>
+                    </div>
+                </div>
             </div>
-        </div>
-        
-        <div class="card history">
-            <h3 class="history-title">Histórico de Pontos</h3>
-            <ul id="historyList" class="history-list"></ul>
         </div>
     </div>
     
-    <div id="notification" class="notification"></div>
+    <div id="notification" class="notification">
+        <span>✅</span>
+        <span id="notificationText"></span>
+    </div>
 
     <script>
         // Inicializar a Telegram Web App
@@ -240,27 +449,58 @@
         
         // Elementos DOM
         const connectBtn = document.getElementById('connectBtn');
-        const disconnectBtn = document.getElementById('disconnectBtn');
         const walletInfo = document.getElementById('walletInfo');
-        const walletAddress = document.getElementById('walletAddress');
-        const gameSection = document.getElementById('gameSection');
         const scoreValue = document.getElementById('scoreValue');
-        const attackBtn = document.getElementById('attackBtn');
-        const specialBtn = document.getElementById('specialBtn');
-        const historyList = document.getElementById('historyList');
+        const perSecondValue = document.getElementById('perSecondValue');
+        const hamster = document.getElementById('hamster');
+        const energyFill = document.getElementById('energyFill');
+        const tapAction = document.getElementById('tapAction');
+        const rechargeAction = document.getElementById('rechargeAction');
+        const booster1 = document.getElementById('booster1');
+        const booster2 = document.getElementById('booster2');
         const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
         
         // Estado do jogo
         let score = 0;
+        let perSecond = 0;
+        let energy = 100;
+        let tapValue = 5;
+        let rechargeCost = 10;
+        let rechargeRate = 1;
         let walletConnected = false;
-        let wallet = null;
+        let walletAddress = "";
+        
+        // Boosters
+        let tapBoostLevel = 1;
+        let energyBoostLevel = 1;
         
         // Verificar se já temos uma carteira conectada (em localStorage)
         window.addEventListener('DOMContentLoaded', () => {
-            const savedWallet = localStorage.getItem('telegramWallet');
-            if (savedWallet) {
-                connectWallet(JSON.parse(savedWallet));
+            const savedData = localStorage.getItem('hamsterKombatData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                score = data.score || 0;
+                perSecond = data.perSecond || 0;
+                energy = data.energy || 100;
+                tapValue = data.tapValue || 5;
+                rechargeRate = data.rechargeRate || 1;
+                tapBoostLevel = data.tapBoostLevel || 1;
+                energyBoostLevel = data.energyBoostLevel || 1;
+                walletConnected = data.walletConnected || false;
+                walletAddress = data.walletAddress || "";
+                
+                updateUI();
+                
+                if (walletConnected) {
+                    connectBtn.style.display = 'none';
+                    walletInfo.style.display = 'flex';
+                }
             }
+            
+            // Iniciar ganho passivo
+            setInterval(passiveIncome, 1000);
+            setInterval(rechargeEnergy, 100);
         });
         
         // Conectar carteira
@@ -276,113 +516,166 @@
             showNotification('Carteira conectada com sucesso!');
         });
         
-        // Desconectar carteira
-        disconnectBtn.addEventListener('click', () => {
-            localStorage.removeItem('telegramWallet');
-            walletConnected = false;
-            wallet = null;
-            
-            connectBtn.style.display = 'block';
-            walletInfo.style.display = 'none';
-            gameSection.style.display = 'none';
-            
-            showNotification('Carteira desconectada');
-        });
-        
-        // Ataque básico
-        attackBtn.addEventListener('click', () => {
-            const points = Math.floor(Math.random() * 5) + 1;
-            addScore(points);
-            animateCharacter();
-            showNotification(`Você ganhou ${points} pontos!`);
-        });
-        
-        // Ataque especial
-        specialBtn.addEventListener('click', () => {
-            // Verificar se tem pontos suficientes para especial
-            if (score >= 10) {
-                const points = Math.floor(Math.random() * 15) + 5;
-                addScore(points);
-                animateCharacter('special');
-                showNotification(`Ataque especial! +${points} pontos!`);
+        // Clique no hamster
+        hamster.addEventListener('click', () => {
+            if (energy >= 10) {
+                // Criar animação de moeda
+                const coin = document.createElement('div');
+                coin.className = 'coin-animation';
+                coin.innerHTML = '+'+tapValue;
+                coin.style.left = (Math.random() * 100) + 'px';
+                hamster.parentElement.appendChild(coin);
                 
-                // Consumir 10 pontos para o especial
-                score -= 10;
-                updateScoreDisplay();
+                // Adicionar pontos
+                addScore(tapValue);
+                energy -= 10;
+                updateEnergyBar();
+                
+                // Animação de pulso
+                hamster.classList.add('pulse');
+                setTimeout(() => {
+                    hamster.classList.remove('pulse');
+                }, 500);
+                
+                // Remover animação após conclusão
+                setTimeout(() => {
+                    coin.remove();
+                }, 1000);
             } else {
-                showNotification('Pontos insuficientes para ataque especial (mínimo 10)');
+                showNotification('Energia insuficiente!');
+            }
+        });
+        
+        // Recarregar energia
+        rechargeAction.addEventListener('click', () => {
+            if (score >= rechargeCost) {
+                score -= rechargeCost;
+                energy = Math.min(100, energy + 30);
+                updateUI();
+                updateEnergyBar();
+                showNotification('Energia recarregada!');
+            } else {
+                showNotification('Moedas insuficientes!');
+            }
+        });
+        
+        // Comprar booster 1 (Tap Melhorado)
+        booster1.addEventListener('click', () => {
+            const cost = 100 * tapBoostLevel;
+            if (score >= cost) {
+                score -= cost;
+                tapValue += 5;
+                tapBoostLevel++;
+                booster1.textContent = 'Melhorar (' + (100 * tapBoostLevel) + ')';
+                updateUI();
+                showNotification('Tap melhorado! Ganho por clique: ' + tapValue);
+            } else {
+                showNotification('Moedas insuficientes!');
+            }
+        });
+        
+        // Comprar booster 2 (Energia Pro)
+        booster2.addEventListener('click', () => {
+            const cost = 150 * energyBoostLevel;
+            if (score >= cost) {
+                score -= cost;
+                rechargeRate += 0.5;
+                energyBoostLevel++;
+                booster2.textContent = 'Melhorar (' + (150 * energyBoostLevel) + ')';
+                updateUI();
+                showNotification('Recarga de energia melhorada!');
+            } else {
+                showNotification('Moedas insuficientes!');
             }
         });
         
         // Função para conectar carteira
         function connectWallet(walletData) {
-            wallet = walletData;
             walletConnected = true;
-            
-            // Salvar no localStorage
-            localStorage.setItem('telegramWallet', JSON.stringify(walletData));
+            walletAddress = walletData.address;
             
             // Atualizar UI
-            walletAddress.textContent = wallet.address;
             connectBtn.style.display = 'none';
-            walletInfo.style.display = 'block';
-            gameSection.style.display = 'block';
+            walletInfo.style.display = 'flex';
+            
+            // Salvar dados
+            saveGameData();
+        }
+        
+        // Ganho passivo de moedas
+        function passiveIncome() {
+            if (perSecond > 0) {
+                addScore(perSecond);
+            }
+        }
+        
+        // Recarregar energia
+        function rechargeEnergy() {
+            if (energy < 100) {
+                energy = Math.min(100, energy + rechargeRate * 0.1);
+                updateEnergyBar();
+            }
+        }
+        
+        // Atualizar barra de energia
+        function updateEnergyBar() {
+            energyFill.style.width = energy + '%';
+            
+            // Mudar cor baseada no nível de energia
+            if (energy > 50) {
+                energyFill.style.background = '#2ED573'; // Verde
+            } else if (energy > 25) {
+                energyFill.style.background = '#FFA502'; // Laranja
+            } else {
+                energyFill.style.background = '#FF4757'; // Vermelho
+            }
+            
+            saveGameData();
         }
         
         // Adicionar pontos
         function addScore(points) {
             score += points;
-            updateScoreDisplay();
-            
-            // Adicionar ao histórico
-            const now = new Date();
-            const timeString = now.toLocaleTimeString();
-            const historyItem = document.createElement('li');
-            historyItem.className = 'history-item';
-            historyItem.innerHTML = `
-                <span>${timeString}</span>
-                <span>+${points} pontos</span>
-            `;
-            historyList.insertBefore(historyItem, historyList.firstChild);
-            
-            // Limitar histórico a 10 itens
-            if (historyList.children.length > 10) {
-                historyList.removeChild(historyList.lastChild);
-            }
-            
-            // Em um app real, aqui enviaríamos os pontos para o contrato/blockchain
+            updateUI();
+            saveGameData();
         }
         
-        // Atualizar display de pontos
-        function updateScoreDisplay() {
-            scoreValue.textContent = score;
+        // Atualizar UI
+        function updateUI() {
+            scoreValue.textContent = formatNumber(score);
+            perSecondValue.textContent = perSecond;
         }
         
-        // Animação do personagem
-        function animateCharacter(type = 'normal') {
-            const character = document.getElementById('character');
-            
-            if (type === 'special') {
-                character.style.transform = 'scale(1.5)';
-                character.style.filter = 'brightness(2) drop-shadow(0 0 10px gold)';
-            } else {
-                character.style.transform = 'scale(1.2)';
-            }
-            
-            setTimeout(() => {
-                character.style.transform = 'scale(1)';
-                character.style.filter = 'none';
-            }, 300);
+        // Formatar número com separadores de milhar
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
         
         // Mostrar notificação
         function showNotification(message) {
-            notification.textContent = message;
+            notificationText.textContent = message;
             notification.classList.add('show');
             
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
+        }
+        
+        // Salvar dados do jogo
+        function saveGameData() {
+            const gameData = {
+                score,
+                perSecond,
+                energy,
+                tapValue,
+                rechargeRate,
+                tapBoostLevel,
+                energyBoostLevel,
+                walletConnected,
+                walletAddress
+            };
+            
+            localStorage.setItem('hamsterKombatData', JSON.stringify(gameData));
         }
     </script>
 </body>
