@@ -269,7 +269,7 @@
         connectWalletBtn.classList.add('hidden');
         walletAddressSpan.classList.remove('text-gray-400');
         walletAddressSpan.classList.add('text-green-400');
-        document.getElementById('wallet-info').querySelector('.w-4').classList.replace('bg-green-500', 'bg-green-500');
+        document.getElementById('wallet-info').querySelector('.w-4').classList.replace('bg-gray-500', 'bg-green-500');
       } else {
         walletAddressSpan.textContent = "Carteira Desconectada";
         connectWalletBtn.classList.remove('hidden');
@@ -361,29 +361,49 @@
       }
     }
 
-    // Inicialização
+    // ** Correção importante: O código de inicialização do app deve ser executado somente após o Telegram Web App estar pronto. **
     Telegram.WebApp.ready();
-    loadData();
-
-    // Event listeners
-    mainClickerButton.addEventListener('click', handleTap);
-    mainClickerButton.addEventListener('touchstart', handleTap); // Suporte para dispositivos móveis
-    modalCloseBtn.addEventListener('click', hideModal);
-
-    navTap.addEventListener('click', () => showSection('tap'));
-    navMissions.addEventListener('click', () => showSection('missions'));
-    navWallet.addEventListener('click', () => showSection('wallet'));
-
-    connectWalletBtn.addEventListener('click', () => {
-      // Simulação da conexão com a carteira
-      isWalletConnected = true;
-      saveData();
-      updateUI();
-      showModal('Conexão de Carteira', 'A carteira do Telegram foi "conectada" com sucesso. Agora você pode participar do Airdrop!');
+    
+    Telegram.WebApp.onEvent('main_button_pressed', function() {
+      // Opcional: Lógica para o botão principal do Telegram, se necessário.
+      // Você pode usá-lo para enviar dados ou fechar o app.
+      // Exemplo: Telegram.WebApp.close();
     });
 
-    // Exibe a seção de "tapping" por padrão
-    showSection('tap');
+    // O aplicativo principal do Telegram está pronto para interagir.
+    Telegram.WebApp.onEvent('ready', () => {
+      // Exibe um alerta de boas-vindas.
+      try {
+        const user = Telegram.WebApp.initDataUnsafe.user;
+        if (user) {
+          Telegram.WebApp.showAlert(`Olá, ${user.first_name}!`);
+        }
+      } catch (e) {
+        // Ignora erros se os dados do usuário não estiverem disponíveis
+      }
+
+      // Agora podemos carregar os dados e iniciar o app
+      loadData();
+      
+      // Adiciona event listeners e exibe a seção de "tapping" por padrão
+      mainClickerButton.addEventListener('click', handleTap);
+      mainClickerButton.addEventListener('touchstart', handleTap);
+      modalCloseBtn.addEventListener('click', hideModal);
+
+      navTap.addEventListener('click', () => showSection('tap'));
+      navMissions.addEventListener('click', () => showSection('missions'));
+      navWallet.addEventListener('click', () => showSection('wallet'));
+
+      connectWalletBtn.addEventListener('click', () => {
+        // Simulação da conexão com a carteira
+        isWalletConnected = true;
+        saveData();
+        updateUI();
+        showModal('Conexão de Carteira', 'A carteira do Telegram foi "conectada" com sucesso. Agora você pode participar do Airdrop!');
+      });
+
+      showSection('tap');
+    });
   </script>
 </body>
 </html>
