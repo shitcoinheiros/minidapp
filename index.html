@@ -6,6 +6,7 @@
   <title>Mini-app de Airdrop</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.js"></script>
   <style>
     :root {
       --tg-theme-bg-color: #1a1a1a;
@@ -132,11 +133,11 @@
         <p id="points-display" class="text-6xl font-extrabold text-yellow-400 mt-2">0</p>
       </div>
       <div id="wallet-info" class="flex items-center justify-center space-x-2 mt-4 text-sm text-gray-400">
-        <div class="w-4 h-4 rounded-full bg-green-500 animate-pulse"></div>
+        <div class="w-4 h-4 rounded-full bg-gray-500 animate-pulse" id="wallet-status-indicator"></div>
         <span id="wallet-address">Carteira Desconectada</span>
       </div>
       <button id="connect-wallet-btn" class="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-full transition-all duration-200">
-        Conectar Carteira do Telegram
+        Conectar Carteira
       </button>
     </div>
 
@@ -178,14 +179,12 @@
     // Configurações e estado do aplicativo
     const POINTS_PER_TAP = 1;
     const LOCAL_STORAGE_KEY = 'hamster_clone_data';
-    const WALLET_CONNECTED_KEY = 'wallet_connected';
     let currentPoints = 0;
     let missions = [
       { id: 'follow-twitter', name: 'Seguir no Twitter', points: 500, completed: false },
       { id: 'join-telegram', name: 'Entrar no canal do Telegram', points: 500, completed: false },
       { id: 'invite-friend', name: 'Convidar um amigo', points: 1000, completed: false },
     ];
-    let isWalletConnected = false;
 
     // Elementos do DOM
     const pointsDisplay = document.getElementById('points-display');
@@ -193,6 +192,7 @@
     const missionsList = document.getElementById('missions-list');
     const walletAddressSpan = document.getElementById('wallet-address');
     const connectWalletBtn = document.getElementById('connect-wallet-btn');
+    const walletStatusIndicator = document.getElementById('wallet-status-indicator');
 
     // Elementos de navegação e seções
     const navTap = document.getElementById('nav-tap');
@@ -219,22 +219,11 @@
       modal.classList.add('hidden');
     }
 
-    // Gerar um endereço de carteira simulado
-    function generateWalletAddress() {
-      const chars = 'abcdef1234567890';
-      let address = '0x';
-      for (let i = 0; i < 40; i++) {
-        address += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return address;
-    }
-
     // Salvar dados no localStorage
     function saveData() {
       const data = {
         points: currentPoints,
         missions: missions,
-        isWalletConnected: isWalletConnected
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
     }
@@ -246,7 +235,6 @@
         const parsedData = JSON.parse(data);
         currentPoints = parsedData.points;
         missions = parsedData.missions;
-        isWalletConnected = parsedData.isWalletConnected;
       }
       updateUI();
     }
@@ -255,27 +243,28 @@
     function updateUI() {
       pointsDisplay.textContent = currentPoints.toLocaleString();
       renderMissions();
-      renderWalletStatus();
     }
 
-    function renderWalletStatus() {
-      if (isWalletConnected) {
-        let savedAddress = localStorage.getItem('wallet_address');
-        if (!savedAddress) {
-          savedAddress = generateWalletAddress();
-          localStorage.setItem('wallet_address', savedAddress);
-        }
-        walletAddressSpan.textContent = `Conectado: ${savedAddress.substring(0, 6)}...${savedAddress.substring(savedAddress.length - 4)}`;
-        connectWalletBtn.classList.add('hidden');
+    function renderWalletStatus(wallet) {
+      if (wallet && wallet.account) {
+        const address = wallet.account.address;
+        walletAddressSpan.textContent = `Conectado: ${address.substring(0, 4)}...${address.substring(address.length - 4)}`;
         walletAddressSpan.classList.remove('text-gray-400');
         walletAddressSpan.classList.add('text-green-400');
-        document.getElementById('wallet-info').querySelector('.w-4').classList.replace('bg-gray-500', 'bg-green-500');
+        walletStatusIndicator.classList.replace('bg-gray-500', 'bg-green-500');
+        connectWalletBtn.textContent = 'Carteira Conectada';
+        connectWalletBtn.disabled = true;
+        connectWalletBtn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+        connectWalletBtn.classList.add('bg-green-600', 'cursor-not-allowed');
       } else {
         walletAddressSpan.textContent = "Carteira Desconectada";
-        connectWalletBtn.classList.remove('hidden');
         walletAddressSpan.classList.add('text-gray-400');
         walletAddressSpan.classList.remove('text-green-400');
-        document.getElementById('wallet-info').querySelector('.w-4').classList.replace('bg-green-500', 'bg-gray-500');
+        walletStatusIndicator.classList.replace('bg-green-500', 'bg-gray-500');
+        connectWalletBtn.textContent = 'Conectar Carteira';
+        connectWalletBtn.disabled = false;
+        connectWalletBtn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+        connectWalletBtn.classList.remove('bg-green-600', 'cursor-not-allowed');
       }
     }
 
@@ -296,7 +285,6 @@
         `;
         missionsList.appendChild(missionItem);
 
-        // Adiciona o evento de clique ao botão da missão
         if (!mission.completed) {
           document.getElementById(`mission-${mission.id}-btn`).addEventListener('click', () => {
             completeMission(mission.id);
@@ -305,7 +293,6 @@
       });
     }
 
-    // Lógica para completar uma missão
     function completeMission(missionId) {
       const mission = missions.find(m => m.id === missionId);
       if (mission && !mission.completed) {
@@ -317,7 +304,6 @@
       }
     }
 
-    // Lógica do clicker
     function handleTap(event) {
       currentPoints += POINTS_PER_TAP;
       pointsDisplay.textContent = currentPoints.toLocaleString();
@@ -339,7 +325,6 @@
       }, 1000);
     }
 
-    // Lógica de navegação
     function showSection(sectionId) {
       tapSection.classList.add('hidden');
       missionsSection.classList.add('hidden');
@@ -361,31 +346,45 @@
       }
     }
 
-    // ** Correção importante: O código de inicialização do app deve ser executado somente após o Telegram Web App estar pronto. **
+    // Inicialização da API do Telegram e do TON Connect
     Telegram.WebApp.ready();
     
-    Telegram.WebApp.onEvent('main_button_pressed', function() {
-      // Opcional: Lógica para o botão principal do Telegram, se necessário.
-      // Você pode usá-lo para enviar dados ou fechar o app.
-      // Exemplo: Telegram.WebApp.close();
-    });
-
-    // O aplicativo principal do Telegram está pronto para interagir.
     Telegram.WebApp.onEvent('ready', () => {
-      // Exibe um alerta de boas-vindas.
       try {
         const user = Telegram.WebApp.initDataUnsafe.user;
         if (user) {
           Telegram.WebApp.showAlert(`Olá, ${user.first_name}!`);
         }
-      } catch (e) {
-        // Ignora erros se os dados do usuário não estiverem disponíveis
-      }
+      } catch (e) {}
 
-      // Agora podemos carregar os dados e iniciar o app
       loadData();
       
-      // Adiciona event listeners e exibe a seção de "tapping" por padrão
+      // Inicializa o TON Connect UI
+      const tonConnectUI = new TonConnectUI.TonConnectUI({
+        manifestUrl: 'https://raw.githubusercontent.com/ton-community/ton-connect-manifests/main/mini-app-manifest.json',
+        actionsConfiguration: {
+          twaReturnUrl: 'https://t.me/your_bot_name/your_web_app' // Substitua pelo link do seu bot/app
+        }
+      });
+
+      // Adiciona a funcionalidade de conexão da carteira ao botão
+      connectWalletBtn.addEventListener('click', () => {
+        tonConnectUI.openModal();
+      });
+
+      // Acompanha a mudança de status da carteira
+      tonConnectUI.onStatusChange(wallet => {
+        if (wallet) {
+          console.log("Carteira conectada:", wallet.account.address);
+          showModal('Conexão de Carteira', `Sua carteira ${wallet.account.address.substring(0, 4)}...${wallet.account.address.substring(wallet.account.address.length - 4)} foi conectada com sucesso!`);
+        } else {
+          console.log("Carteira desconectada.");
+          showModal('Carteira Desconectada', 'Sua carteira foi desconectada.');
+        }
+        renderWalletStatus(wallet);
+      });
+      
+      // Adiciona event listeners para o resto da aplicação
       mainClickerButton.addEventListener('click', handleTap);
       mainClickerButton.addEventListener('touchstart', handleTap);
       modalCloseBtn.addEventListener('click', hideModal);
@@ -394,14 +393,7 @@
       navMissions.addEventListener('click', () => showSection('missions'));
       navWallet.addEventListener('click', () => showSection('wallet'));
 
-      connectWalletBtn.addEventListener('click', () => {
-        // Simulação da conexão com a carteira
-        isWalletConnected = true;
-        saveData();
-        updateUI();
-        showModal('Conexão de Carteira', 'A carteira do Telegram foi "conectada" com sucesso. Agora você pode participar do Airdrop!');
-      });
-
+      // Exibe a seção de "tapping" por padrão
       showSection('tap');
     });
   </script>
