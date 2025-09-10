@@ -1,17 +1,389 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meu MiniApp Telegram</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>Olá, Mundo!</h1>
-  <p>Este é um miniaplicativo de exemplo para o Telegram.</p>
-  <button id="sendData">Enviar Dados para o Chat</button>
-
+  <title>Mini-app de Airdrop</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="script.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --tg-theme-bg-color: #1a1a1a;
+      --tg-theme-text-color: #ffffff;
+      --tg-theme-hint-color: #aaaaaa;
+      --tg-theme-link-color: #6a96f1;
+      --tg-theme-button-color: #5d92ff;
+      --tg-theme-button-text-color: #ffffff;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--tg-theme-bg-color);
+      color: var(--tg-theme-text-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100vh;
+      margin: 0;
+      padding-bottom: 80px; /* Espaço para a barra de navegação */
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      width: 100%;
+      padding: 1rem;
+    }
+
+    .main-clicker {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .main-clicker-button {
+      width: 200px;
+      height: 200px;
+      background-color: #ffcc00; /* Cor amarela para o botão principal */
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: bold;
+      color: #000;
+      box-shadow: 0 10px 20px rgba(255, 204, 0, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.7);
+      transition: transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    .main-clicker-button:active {
+      transform: scale(0.95);
+      box-shadow: 0 5px 10px rgba(255, 204, 0, 0.5), inset 0 0 5px rgba(255, 255, 255, 0.7);
+    }
+
+    .points-bubble {
+      position: absolute;
+      font-size: 1.5rem;
+      color: #fff;
+      font-weight: bold;
+      animation: floatUp 1s forwards;
+      pointer-events: none;
+    }
+
+    @keyframes floatUp {
+      from { transform: translateY(0); opacity: 1; }
+      to { transform: translateY(-50px); opacity: 0; }
+    }
+
+    .navbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 70px;
+      background-color: var(--tg-theme-bg-color);
+      border-top: 1px solid #333;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.75rem;
+      color: var(--tg-theme-hint-color);
+      transition: color 0.2s ease;
+    }
+
+    .nav-item.active {
+      color: var(--tg-theme-button-text-color);
+    }
+
+    .nav-icon {
+      font-size: 1.5rem;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white font-sans">
+
+  <!-- Modal para a mensagem -->
+  <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+    <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700 max-w-sm w-full">
+      <h2 id="modal-title" class="text-xl font-bold mb-2"></h2>
+      <p id="modal-message" class="text-gray-300"></p>
+      <button id="modal-close-btn" class="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700">Fechar</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Seção de Pontos e Carteira -->
+    <div id="wallet-and-points-section" class="flex flex-col items-center justify-center p-4">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold">Total de Pontos</h2>
+        <p id="points-display" class="text-6xl font-extrabold text-yellow-400 mt-2">0</p>
+      </div>
+      <div id="wallet-info" class="flex items-center justify-center space-x-2 mt-4 text-sm text-gray-400">
+        <div class="w-4 h-4 rounded-full bg-green-500 animate-pulse"></div>
+        <span id="wallet-address">Carteira Desconectada</span>
+      </div>
+      <button id="connect-wallet-btn" class="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-full transition-all duration-200">
+        Conectar Carteira do Telegram
+      </button>
+    </div>
+
+    <!-- Seção Principal de "Tapping" -->
+    <div id="tap-section" class="flex flex-col items-center justify-center main-clicker hidden">
+      <div id="main-clicker-button" class="main-clicker-button select-none">
+        TAP
+      </div>
+      <p class="text-yellow-400 font-bold mt-4">+1</p>
+    </div>
+
+    <!-- Seção de Missões -->
+    <div id="missions-section" class="p-4 hidden">
+      <h2 class="text-2xl font-bold mb-4 text-center">Missões de Airdrop 🚀</h2>
+      <p class="text-center text-gray-400 mb-6">Complete as missões para ganhar pontos e ter direito ao Airdrop!</p>
+      <div id="missions-list" class="space-y-4">
+        <!-- Missões serão inseridas aqui via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de Navegação Inferior -->
+  <div class="navbar z-40">
+    <div id="nav-tap" class="nav-item active">
+      <div class="nav-icon">👆</div>
+      <span>Tap</span>
+    </div>
+    <div id="nav-missions" class="nav-item">
+      <div class="nav-icon">🎁</div>
+      <span>Missões</span>
+    </div>
+    <div id="nav-wallet" class="nav-item">
+      <div class="nav-icon">👛</div>
+      <span>Carteira</span>
+    </div>
+  </div>
+
+  <script>
+    // Configurações e estado do aplicativo
+    const POINTS_PER_TAP = 1;
+    const LOCAL_STORAGE_KEY = 'hamster_clone_data';
+    const WALLET_CONNECTED_KEY = 'wallet_connected';
+    let currentPoints = 0;
+    let missions = [
+      { id: 'follow-twitter', name: 'Seguir no Twitter', points: 500, completed: false },
+      { id: 'join-telegram', name: 'Entrar no canal do Telegram', points: 500, completed: false },
+      { id: 'invite-friend', name: 'Convidar um amigo', points: 1000, completed: false },
+    ];
+    let isWalletConnected = false;
+
+    // Elementos do DOM
+    const pointsDisplay = document.getElementById('points-display');
+    const mainClickerButton = document.getElementById('main-clicker-button');
+    const missionsList = document.getElementById('missions-list');
+    const walletAddressSpan = document.getElementById('wallet-address');
+    const connectWalletBtn = document.getElementById('connect-wallet-btn');
+
+    // Elementos de navegação e seções
+    const navTap = document.getElementById('nav-tap');
+    const navMissions = document.getElementById('nav-missions');
+    const navWallet = document.getElementById('nav-wallet');
+    const tapSection = document.getElementById('tap-section');
+    const missionsSection = document.getElementById('missions-section');
+    const walletAndPointsSection = document.getElementById('wallet-and-points-section');
+
+    // Elementos do modal
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalMessage = document.getElementById('modal-message');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+
+    // Funções utilitárias
+    function showModal(title, message) {
+      modalTitle.textContent = title;
+      modalMessage.textContent = message;
+      modal.classList.remove('hidden');
+    }
+
+    function hideModal() {
+      modal.classList.add('hidden');
+    }
+
+    // Gerar um endereço de carteira simulado
+    function generateWalletAddress() {
+      const chars = 'abcdef1234567890';
+      let address = '0x';
+      for (let i = 0; i < 40; i++) {
+        address += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return address;
+    }
+
+    // Salvar dados no localStorage
+    function saveData() {
+      const data = {
+        points: currentPoints,
+        missions: missions,
+        isWalletConnected: isWalletConnected
+      };
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+    }
+
+    // Carregar dados do localStorage
+    function loadData() {
+      const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (data) {
+        const parsedData = JSON.parse(data);
+        currentPoints = parsedData.points;
+        missions = parsedData.missions;
+        isWalletConnected = parsedData.isWalletConnected;
+      }
+      updateUI();
+    }
+
+    // Atualizar a interface do usuário
+    function updateUI() {
+      pointsDisplay.textContent = currentPoints.toLocaleString();
+      renderMissions();
+      renderWalletStatus();
+    }
+
+    function renderWalletStatus() {
+      if (isWalletConnected) {
+        let savedAddress = localStorage.getItem('wallet_address');
+        if (!savedAddress) {
+          savedAddress = generateWalletAddress();
+          localStorage.setItem('wallet_address', savedAddress);
+        }
+        walletAddressSpan.textContent = `Conectado: ${savedAddress.substring(0, 6)}...${savedAddress.substring(savedAddress.length - 4)}`;
+        connectWalletBtn.classList.add('hidden');
+        walletAddressSpan.classList.remove('text-gray-400');
+        walletAddressSpan.classList.add('text-green-400');
+        document.getElementById('wallet-info').querySelector('.w-4').classList.replace('bg-green-500', 'bg-green-500');
+      } else {
+        walletAddressSpan.textContent = "Carteira Desconectada";
+        connectWalletBtn.classList.remove('hidden');
+        walletAddressSpan.classList.add('text-gray-400');
+        walletAddressSpan.classList.remove('text-green-400');
+        document.getElementById('wallet-info').querySelector('.w-4').classList.replace('bg-green-500', 'bg-gray-500');
+      }
+    }
+
+    function renderMissions() {
+      missionsList.innerHTML = '';
+      missions.forEach(mission => {
+        const missionItem = document.createElement('div');
+        missionItem.className = 'bg-gray-800 p-4 rounded-xl flex justify-between items-center transition-all duration-200 hover:bg-gray-700';
+        
+        missionItem.innerHTML = `
+          <div>
+            <h3 class="font-bold text-lg">${mission.name}</h3>
+            <p class="text-yellow-400 text-sm mt-1">+${mission.points.toLocaleString()} pontos</p>
+          </div>
+          <button id="mission-${mission.id}-btn" class="px-4 py-2 rounded-full font-bold transition-colors duration-200 ${mission.completed ? 'bg-green-600 text-white cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'}" ${mission.completed ? 'disabled' : ''}>
+            ${mission.completed ? 'Concluída' : 'Completar'}
+          </button>
+        `;
+        missionsList.appendChild(missionItem);
+
+        // Adiciona o evento de clique ao botão da missão
+        if (!mission.completed) {
+          document.getElementById(`mission-${mission.id}-btn`).addEventListener('click', () => {
+            completeMission(mission.id);
+          });
+        }
+      });
+    }
+
+    // Lógica para completar uma missão
+    function completeMission(missionId) {
+      const mission = missions.find(m => m.id === missionId);
+      if (mission && !mission.completed) {
+        mission.completed = true;
+        currentPoints += mission.points;
+        updateUI();
+        saveData();
+        showModal('Missão Concluída!', `Você ganhou ${mission.points.toLocaleString()} pontos por completar a missão "${mission.name}".`);
+      }
+    }
+
+    // Lógica do clicker
+    function handleTap(event) {
+      currentPoints += POINTS_PER_TAP;
+      pointsDisplay.textContent = currentPoints.toLocaleString();
+      saveData();
+      
+      const rect = mainClickerButton.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      const pointsBubble = document.createElement('div');
+      pointsBubble.textContent = `+${POINTS_PER_TAP}`;
+      pointsBubble.className = 'points-bubble';
+      pointsBubble.style.left = `${x}px`;
+      pointsBubble.style.top = `${y}px`;
+      mainClickerButton.appendChild(pointsBubble);
+
+      setTimeout(() => {
+        pointsBubble.remove();
+      }, 1000);
+    }
+
+    // Lógica de navegação
+    function showSection(sectionId) {
+      tapSection.classList.add('hidden');
+      missionsSection.classList.add('hidden');
+      walletAndPointsSection.classList.add('hidden');
+
+      navTap.classList.remove('active');
+      navMissions.classList.remove('active');
+      navWallet.classList.remove('active');
+
+      if (sectionId === 'tap') {
+        tapSection.classList.remove('hidden');
+        navTap.classList.add('active');
+      } else if (sectionId === 'missions') {
+        missionsSection.classList.remove('hidden');
+        navMissions.classList.add('active');
+      } else if (sectionId === 'wallet') {
+        walletAndPointsSection.classList.remove('hidden');
+        navWallet.classList.add('active');
+      }
+    }
+
+    // Inicialização
+    Telegram.WebApp.ready();
+    loadData();
+
+    // Event listeners
+    mainClickerButton.addEventListener('click', handleTap);
+    mainClickerButton.addEventListener('touchstart', handleTap); // Suporte para dispositivos móveis
+    modalCloseBtn.addEventListener('click', hideModal);
+
+    navTap.addEventListener('click', () => showSection('tap'));
+    navMissions.addEventListener('click', () => showSection('missions'));
+    navWallet.addEventListener('click', () => showSection('wallet'));
+
+    connectWalletBtn.addEventListener('click', () => {
+      // Simulação da conexão com a carteira
+      isWalletConnected = true;
+      saveData();
+      updateUI();
+      showModal('Conexão de Carteira', 'A carteira do Telegram foi "conectada" com sucesso. Agora você pode participar do Airdrop!');
+    });
+
+    // Exibe a seção de "tapping" por padrão
+    showSection('tap');
+  </script>
 </body>
 </html>
