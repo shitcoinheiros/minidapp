@@ -1,0 +1,24 @@
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-color: var(--tg-theme-bg-color, #fff); /* Usa a cor de fundo do tema do Telegram */
+  color: var(--tg-theme-text-color, #000); /* Usa a cor do texto do tema do Telegram */
+}
+
+h1 {
+  color: var(--tg-theme-accent-text-color, #007bff); /* Usa uma cor de destaque do tema do Telegram */
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--tg-theme-button-color, #007bff); /* Usa a cor do botão do tema do Telegram */
+  color: var(--tg-theme-button-text-color, #fff); /* Usa a cor do texto do botão do tema do Telegram */
+  cursor: pointer;
+}
