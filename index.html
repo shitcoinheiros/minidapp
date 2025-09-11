@@ -3,21 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hamster Kombat - TON</title>
+    <title>TeleRide - Seu Uber no Telegram</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- TON Connect SDK -->
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <style>
         :root {
-            --primary-gold: #FFD700;
-            --secondary-gold: #D4AF37;
-            --dark-bg: #1A1A1A;
-            --card-bg: #252525;
-            --text-light: #FFFFFF;
-            --text-gray: #AAAAAA;
-            --energy-red: #FF4757;
-            --boost-green: #2ED573;
-            --ton-blue: #0088CC;
+            --primary: #0088cc;
+            --secondary: #f8f9fa;
+            --dark: #212529;
+            --light: #ffffff;
+            --gray: #6c757d;
         }
         
         * {
@@ -28,814 +22,209 @@
         }
         
         body {
-            background: var(--dark-bg);
-            color: var(--text-light);
-            min-height: 100vh;
+            background-color: var(--secondary);
+            color: var(--dark);
             padding: 16px;
-            background-image: radial-gradient(circle at 15% 50%, #2A2A2A, #1A1A1A);
         }
         
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-        }
-        
-        header {
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
             padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
         }
         
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--primary);
         }
         
-        .logo-icon {
+        .user-img {
             width: 40px;
             height: 40px;
-            background: var(--primary-gold);
             border-radius: 50%;
+            background-color: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 20px;
-            color: #000;
-        }
-        
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: bold;
-            background: linear-gradient(to right, var(--primary-gold), var(--secondary-gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .wallet-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .wallet-btn {
-            background: linear-gradient(to right, var(--ton-blue), #005F8B);
             color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            font-weight: bold;
         }
         
-        .wallet-connected {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 5px;
-            background: rgba(0, 136, 204, 0.2);
-            padding: 8px 12px;
+        .map-container {
+            height: 300px;
+            background-color: #e9ecef;
             border-radius: 12px;
-            font-size: 0.9rem;
-        }
-        
-        .wallet-address {
-            font-size: 0.8rem;
-            color: var(--text-gray);
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center;
+            color: var(--gray);
         }
         
-        .wallet-balance {
-            font-size: 0.9rem;
-            color: var(--primary-gold);
-            font-weight: 600;
+        .destination-input {
+            background-color: var(--light);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        .disconnect-btn {
-            background: transparent;
-            color: var(--text-gray);
-            border: 1px solid var(--text-gray);
-            padding: 4px 8px;
-            border-radius: 8px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            margin-top: 5px;
-        }
-        
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .score-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 215, 0, 0.2);
-        }
-        
-        .score-label {
+        .destination-input input {
+            width: 100%;
+            border: none;
+            outline: none;
             font-size: 1rem;
-            color: var(--text-gray);
+            padding: 10px 0;
+        }
+        
+        .ride-options {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 5px 0;
+        }
+        
+        .ride-option {
+            min-width: 100px;
+            background-color: var(--light);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .ride-option.active {
+            border: 2px solid var(--primary);
+        }
+        
+        .ride-icon {
+            font-size: 1.5rem;
             margin-bottom: 5px;
         }
         
-        .score-value {
-            font-size: 2.5rem;
+        .ride-name {
             font-weight: bold;
-            background: linear-gradient(to right, var(--primary-gold), var(--secondary-gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 15px;
-        }
-        
-        .score-per-second {
             font-size: 0.9rem;
-            color: var(--text-gray);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
         }
         
-        .hamster-area {
-            position: relative;
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 30px 20px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            min-height: 280px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .hamster-container {
-            width: 150px;
-            height: 150px;
-            position: relative;
-            margin-bottom: 20px;
-        }
-        
-        .hamster {
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="40" r="30" fill="%23FFD700"/><circle cx="50" cy="40" r="20" fill="%23FFED85"/><circle cx="40" cy="35" r="5" fill="%23333"/><circle cx="60" cy="35" r="5" fill="%23333"/><path d="M45 55 Q50 60 55 55" stroke="%23333" stroke-width="2" fill="none"/><ellipse cx="50" cy="75" rx="20" ry="15" fill="%23FFD700"/><rect x="30" y="70" width="40" height="10" fill="%23FFD700"/></svg>') no-repeat center;
-            background-size: contain;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-        
-        .hamster:active {
-            transform: scale(0.95);
-        }
-        
-        .energy-bar {
-            width: 80%;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-        
-        .energy-fill {
-            height: 100%;
-            background: var(--energy-red);
-            border-radius: 5px;
-            width: 70%;
-            transition: width 0.3s;
-        }
-        
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .action-btn {
-            background: linear-gradient(to bottom, #3A3A3A, #2A2A2A);
-            border: none;
-            border-radius: 12px;
-            padding: 15px;
-            color: var(--text-light);
-            font-weight: 500;
-            cursor: pointer;
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s;
-        }
-        
-        .action-btn:active {
-            transform: scale(0.98);
-        }
-        
-        .action-name {
-            font-size: 1rem;
-            font-weight: 600;
-        }
-        
-        .action-desc {
+        .ride-price {
             font-size: 0.8rem;
-            color: var(--text-gray);
+            color: var(--gray);
         }
         
-        .action-value {
-            font-size: 0.9rem;
-            color: var(--primary-gold);
-            margin-top: 5px;
-        }
-        
-        .boosters-section {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .boosters-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-        
-        .booster-card {
-            background: linear-gradient(to bottom, #3A3A3A, #2A2A2A);
-            border-radius: 12px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            border: 1px solid rgba(255, 215, 0, 0.1);
-        }
-        
-        .booster-name {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--primary-gold);
-        }
-        
-        .booster-desc {
-            font-size: 0.8rem;
-            color: var(--text-gray);
-        }
-        
-        .booster-cost {
-            font-size: 0.9rem;
-            color: var(--boost-green);
-            margin-top: 5px;
-        }
-        
-        .booster-btn {
-            background: linear-gradient(to right, var(--primary-gold), var(--secondary-gold));
-            color: #000;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 5px;
-            font-size: 0.9rem;
-        }
-        
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
+        .confirm-btn {
+            background-color: var(--primary);
             color: white;
-            padding: 12px 20px;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--light);
             display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 8px;
+            font-size: 0.8rem;
         }
         
-        .notification.show {
-            opacity: 1;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: var(--ton-blue);
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        @media (max-width: 480px) {
-            .actions-grid, .boosters-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .score-value {
-                font-size: 2rem;
-            }
-            
-            .hamster-container {
-                width: 120px;
-                height: 120px;
-            }
-            
-            header {
-                flex-direction: column;
-                gap: 10px;
-                align-items: flex-start;
-            }
-            
-            .wallet-section {
-                width: 100%;
-                justify-content: flex-end;
-            }
-        }
-        
-        .pulse {
-            animation: pulse-animation 0.5s;
-        }
-        
-        @keyframes pulse-animation {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .coin-animation {
-            position: absolute;
-            font-size: 1.5rem;
-            opacity: 0;
-            pointer-events: none;
-            animation: coin-float 1s forwards;
-        }
-        
-        @keyframes coin-float {
-            0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-50px); opacity: 0; }
-        }
-
-        #ton-connect-button {
-            margin: 0;
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">
-                <div class="logo-icon">🐹</div>
-                <div class="logo-text">Hamster Kombat</div>
-            </div>
-            <div class="wallet-section">
-                <div id="walletInfo" class="wallet-connected" style="display: none;">
-                    <div class="wallet-address">
-                        <span>✅</span>
-                        <span id="walletShortAddress"></span>
-                    </div>
-                    <div class="wallet-balance">
-                        <span id="tonBalance">0 TON</span>
-                    </div>
-                    <button id="disconnectBtn" class="disconnect-btn">Desconectar</button>
-                </div>
-                <div id="ton-connect-button"></div>
-            </div>
-        </header>
-        
-        <div class="main-content">
-            <div class="score-card">
-                <div class="score-label">Saldo de Moedas</div>
-                <div id="scoreValue" class="score-value">0</div>
-                <div class="score-per-second">
-                    <span>⏱</span>
-                    <span id="perSecondValue">0</span> por segundo
-                </div>
-            </div>
-            
-            <div class="hamster-area">
-                <div class="hamster-container">
-                    <div id="hamster" class="hamster"></div>
-                    <div class="energy-bar">
-                        <div id="energyFill" class="energy-fill"></div>
-                    </div>
-                </div>
-                <div class="actions-grid">
-                    <button class="action-btn" id="tapAction">
-                        <span class="action-name">Tap</span>
-                        <span class="action-desc">Clique no hamster para ganhar moedas</span>
-                        <span class="action-value">+5 moedas</span>
-                    </button>
-                    <button class="action-btn" id="rechargeAction">
-                        <span class="action-name">Recarregar</span>
-                        <span class="action-desc">Recupere energia mais rapidamente</span>
-                        <span class="action-value">-10 moedas</span>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="boosters-section">
-                <div class="section-title">
-                    <span>🚀</span>
-                    <span>Impulsionadores</span>
-                </div>
-                <div class="boosters-grid">
-                    <div class="booster-card">
-                        <span class="booster-name">Tap Melhorado</span>
-                        <span class="booster-desc">Dobra os ganhos por clique</span>
-                        <span class="booster-cost">Custo: 100 moedas</span>
-                        <button class="booster-btn" id="booster1">Comprar</button>
-                    </div>
-                    <div class="booster-card">
-                        <span class="booster-name">Energia Pro</span>
-                        <span class="booster-desc">Recarrega 50% mais rápido</span>
-                        <span class="booster-cost">Custo: 150 moedas</span>
-                        <button class="booster-btn" id="booster2">Comprar</button>
-                    </div>
-                </div>
-            </div>
+    <div class="header">
+        <div class="logo">TeleRide</div>
+        <div class="user-img">JS</div>
+    </div>
+    
+    <div class="map-container">
+        Mapa interativo aqui (integraria com API como Google Maps)
+    </div>
+    
+    <div class="destination-input">
+        <input type="text" placeholder="Para onde você quer ir?">
+    </div>
+    
+    <div class="ride-options">
+        <div class="ride-option active">
+            <div class="ride-icon">🚗</div>
+            <div class="ride-name">Econômico</div>
+            <div class="ride-price">R$ 15,00</div>
+        </div>
+        <div class="ride-option">
+            <div class="ride-icon">🚙</div>
+            <div class="ride-name">Confort</div>
+            <div class="ride-price">R$ 22,00</div>
+        </div>
+        <div class="ride-option">
+            <div class="ride-icon">🚕</div>
+            <div class="ride-name">Táxi</div>
+            <div class="ride-price">R$ 19,00</div>
         </div>
     </div>
     
-    <div id="notification" class="notification">
-        <span>✅</span>
-        <span id="notificationText"></span>
+    <button class="confirm-btn">Solicitar TeleRide</button>
+    
+    <div class="bottom-nav">
+        <div class="nav-item">
+            <div class="nav-icon">🔍</div>
+            <span>Buscar</span>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">📝</div>
+            <span>Viagens</span>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">⚙️</div>
+            <span>Config</span>
+        </div>
     </div>
 
     <script>
-        // Inicializar a Telegram Web App
+        // Inicializar a Web App do Telegram
         let tg = window.Telegram.WebApp;
         tg.expand();
         tg.enableClosingConfirmation();
         
-        // Inicializar TON Connect
-        let tonConnectUI = null;
-        
-        // Elementos DOM
-        const walletInfo = document.getElementById('walletInfo');
-        const walletShortAddress = document.getElementById('walletShortAddress');
-        const tonBalance = document.getElementById('tonBalance');
-        const disconnectBtn = document.getElementById('disconnectBtn');
-        const scoreValue = document.getElementById('scoreValue');
-        const perSecondValue = document.getElementById('perSecondValue');
-        const hamster = document.getElementById('hamster');
-        const energyFill = document.getElementById('energyFill');
-        const tapAction = document.getElementById('tapAction');
-        const rechargeAction = document.getElementById('rechargeAction');
-        const booster1 = document.getElementById('booster1');
-        const booster2 = document.getElementById('booster2');
-        const notification = document.getElementById('notification');
-        const notificationText = document.getElementById('notificationText');
-        
-        // Estado do jogo
-        let score = 0;
-        let perSecond = 0;
-        let energy = 100;
-        let tapValue = 5;
-        let rechargeCost = 10;
-        let rechargeRate = 1;
-        let walletConnected = false;
-        let walletAddress = "";
-        let userBalance = 0;
-        
-        // Boosters
-        let tapBoostLevel = 1;
-        let energyBoostLevel = 1;
-        
-        // Inicializar TON Connect
-        async function initTonConnect() {
-            try {
-                // Configuração do manifesto (substitua com suas informações reais)
-                const manifestUrl = 'https://raw.githubusercontent.com/shitcoinheiros/minidapp/refs/heads/main/tonconnect-manifest.json';
-                
-                // Inicializar TON Connect UI
-                tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-                    manifestUrl: manifestUrl,
-                    buttonRootId: 'ton-connect-button',
-                    language: 'pt',
-                    uiPreferences: {
-                        theme: 'DARK',
-                        colorsSet: {
-                            [TON_CONNECT_UI.THEME.DARK]: {
-                                connectButton: {
-                                    background: '#0088cc',
-                                    foreground: '#ffffff'
-                                }
-                            }
-                        }
-                    }
-                });
-                
-                // Verificar estado de conexão
-                const state = tonConnectUI.connectionState;
-                if (state.status === 'connected') {
-                    walletConnected = true;
-                    walletAddress = state.account.address;
-                    updateWalletUI();
-                    await getWalletBalance();
-                }
-                
-                // Adicionar listener para mudanças de estado
-                tonConnectUI.onStatusChange(async (wallet) => {
-                    if (wallet) {
-                        walletConnected = true;
-                        walletAddress = wallet.account.address;
-                        updateWalletUI();
-                        await getWalletBalance();
-                        showNotification('Carteira conectada com sucesso!');
-                    } else {
-                        walletConnected = false;
-                        walletAddress = "";
-                        walletInfo.style.display = 'none';
-                        showNotification('Carteira desconectada');
-                    }
-                    
-                    saveGameData();
-                });
-                
-            } catch (error) {
-                console.error('Erro ao inicializar TON Connect:', error);
-                showNotification('Erro ao conectar com a carteira');
-            }
-        }
-        
-        // Obter saldo da carteira
-        async function getWalletBalance() {
-            try {
-                if (!walletConnected) return;
-                
-                // Em produção, isso buscaria o saldo real da blockchain TON
-                // usando a TON API ou outra biblioteca
-                const state = tonConnectUI.connectionState;
-                if (state.status === 'connected') {
-                    // Simular obtenção de saldo (substitua pela chamada real à API)
-                    userBalance = Math.random() * 10;
-                    tonBalance.textContent = userBalance.toFixed(2) + ' TON';
-                }
-                
-            } catch (error) {
-                console.error('Erro ao obter saldo:', error);
-                tonBalance.textContent = 'Erro ao carregar';
-            }
-        }
-        
-        // Desconectar carteira
-        function disconnectWallet() {
-            if (tonConnectUI) {
-                tonConnectUI.disconnect();
-            }
-        }
-        
-        // Atualizar UI da carteira
-        function updateWalletUI() {
-            walletInfo.style.display = 'flex';
-            
-            // Formatar endereço para exibição (primeiros e últimos 4 caracteres)
-            const start = walletAddress.substring(0, 4);
-            const end = walletAddress.substring(walletAddress.length - 4);
-            walletShortAddress.textContent = `${start}...${end}`;
-            
-            // Atualizar saldo
-            getWalletBalance();
-        }
-        
-        // Event listeners
-        window.addEventListener('DOMContentLoaded', () => {
-            // Inicializar TON Connect
-            initTonConnect();
-            
-            // Carregar dados salvos
-            const savedData = localStorage.getItem('hamsterKombatData');
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                score = data.score || 0;
-                perSecond = data.perSecond || 0;
-                energy = data.energy || 100;
-                tapValue = data.tapValue || 5;
-                rechargeRate = data.rechargeRate || 1;
-                tapBoostLevel = data.tapBoostLevel || 1;
-                energyBoostLevel = data.energyBoostLevel || 1;
-                walletConnected = data.walletConnected || false;
-                walletAddress = data.walletAddress || "";
-                
-                updateUI();
-                
-                if (walletConnected) {
-                    updateWalletUI();
-                }
-            }
-            
-            // Iniciar ganho passivo
-            setInterval(passiveIncome, 1000);
-            setInterval(rechargeEnergy, 100);
+        // Exemplo de interação com a API do Telegram
+        tg.MainButton.setText("SOLICITAR CORRIDA").show().onClick(function() {
+            tg.showPopup({
+                title: "Corrida solicitada!",
+                message: "Seu motorista chegará em aproximadamente 5 minutos",
+                buttons: [{type: "ok"}]
+            });
         });
         
-        // Desconectar carteira
-        disconnectBtn.addEventListener('click', disconnectWallet);
-        
-        // Clique no hamster
-        hamster.addEventListener('click', () => {
-            if (!walletConnected) {
-                showNotification('Conecte sua carteira primeiro!');
-                return;
-            }
-            
-            if (energy >= 10) {
-                // Criar animação de moeda
-                const coin = document.createElement('div');
-                coin.className = 'coin-animation';
-                coin.innerHTML = '+'+tapValue;
-                coin.style.left = (Math.random() * 100) + 'px';
-                hamster.parentElement.appendChild(coin);
-                
-                // Adicionar pontos
-                addScore(tapValue);
-                energy -= 10;
-                updateEnergyBar();
-                
-                // Animação de pulso
-                hamster.classList.add('pulse');
-                setTimeout(() => {
-                    hamster.classList.remove('pulse');
-                }, 500);
-                
-                // Remover animação após conclusão
-                setTimeout(() => {
-                    coin.remove();
-                }, 1000);
-            } else {
-                showNotification('Energia insuficiente!');
-            }
+        // Seleção de tipo de corrida
+        const rideOptions = document.querySelectorAll('.ride-option');
+        rideOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                rideOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+            });
         });
-        
-        // Recarregar energia
-        rechargeAction.addEventListener('click', () => {
-            if (!walletConnected) {
-                showNotification('Conecte sua carteira primeiro!');
-                return;
-            }
-            
-            if (score >= rechargeCost) {
-                score -= rechargeCost;
-                energy = Math.min(100, energy + 30);
-                updateUI();
-                updateEnergyBar();
-                showNotification('Energia recarregada!');
-            } else {
-                showNotification('Moedas insuficientes!');
-            }
-        });
-        
-        // Comprar booster 1 (Tap Melhorado)
-        booster1.addEventListener('click', () => {
-            if (!walletConnected) {
-                showNotification('Conecte sua carteira primeiro!');
-                return;
-            }
-            
-            const cost = 100 * tapBoostLevel;
-            if (score >= cost) {
-                score -= cost;
-                tapValue += 5;
-                tapBoostLevel++;
-                booster1.textContent = 'Melhorar (' + (100 * tapBoostLevel) + ')';
-                updateUI();
-                showNotification('Tap melhorado! Ganho por clique: ' + tapValue);
-            } else {
-                showNotification('Moedas insuficientes!');
-            }
-        });
-        
-        // Comprar booster 2 (Energia Pro)
-        booster2.addEventListener('click', () => {
-            if (!walletConnected) {
-                showNotification('Conecte sua carteira primeiro!');
-                return;
-            }
-            
-            const cost = 150 * energyBoostLevel;
-            if (score >= cost) {
-                score -= cost;
-                rechargeRate += 0.5;
-                energyBoostLevel++;
-                booster2.textContent = 'Melhorar (' + (150 * energyBoostLevel) + ')';
-                updateUI();
-                showNotification('Recarga de energia melhorada!');
-            } else {
-                showNotification('Moedas insuficientes!');
-            }
-        });
-        
-        // Ganho passivo de moedas
-        function passiveIncome() {
-            if (perSecond > 0 && walletConnected) {
-                addScore(perSecond);
-            }
-        }
-        
-        // Recarregar energia
-        function rechargeEnergy() {
-            if (energy < 100) {
-                energy = Math.min(100, energy + rechargeRate * 0.1);
-                updateEnergyBar();
-            }
-        }
-        
-        // Atualizar barra de energia
-        function updateEnergyBar() {
-            energyFill.style.width = energy + '%';
-            
-            // Mudar cor baseada no nível de energia
-            if (energy > 50) {
-                energyFill.style.background = '#2ED573'; // Verde
-            } else if (energy > 25) {
-                energyFill.style.background = '#FFA502'; // Laranja
-            } else {
-                energyFill.style.background = '#FF4757'; // Vermelho
-            }
-            
-            saveGameData();
-        }
-        
-        // Adicionar pontos
-        function addScore(points) {
-            score += points;
-            updateUI();
-            saveGameData();
-        }
-        
-        // Atualizar UI
-        function updateUI() {
-            scoreValue.textContent = formatNumber(score);
-            perSecondValue.textContent = perSecond;
-        }
-        
-        // Formatar número com separadores de milhar
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        }
-        
-        // Mostrar notificação
-        function showNotification(message) {
-            notificationText.textContent = message;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-        
-        // Salvar dados do jogo
-        function saveGameData() {
-            const gameData = {
-                score,
-                perSecond,
-                energy,
-                tapValue,
-                rechargeRate,
-                tapBoostLevel,
-                energyBoostLevel,
-                walletConnected,
-                walletAddress
-            };
-            
-            localStorage.setItem('hamsterKombatData', JSON.stringify(gameData));
-        }
     </script>
 </body>
 </html>
