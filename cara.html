@@ -155,15 +155,26 @@
             // Desabilita os botões para evitar múltiplas apostas
             botoesAposta.forEach(btn => btn.disabled = true);
             
-            // Duplica os itens para a roleta ter mais "giro"
-            const itensDuplicados = [...itensRoleta, ...itensRoleta, ...itensRoleta];
+            // Duplica os itens da roleta na memória para o giro
+            // e os insere no HTML antes de girar.
+            const itensParaGirar = [...itensRoleta, ...itensRoleta, ...itensRoleta];
             
+            // Recria os itens na roleta para a animação
+            roleta.innerHTML = '';
+            itensParaGirar.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'roleta-item';
+                div.textContent = item.nome;
+                div.style.backgroundColor = item.cor;
+                roleta.appendChild(div);
+            });
+
             // Escolhe um item aleatório para ser o resultado
             const resultadoIndex = Math.floor(Math.random() * itensRoleta.length);
             const resultado = itensRoleta[resultadoIndex];
             
             // Calcula o deslocamento para o item vencedor
-            const deslocamento = (itensRoleta.length * 2 + resultadoIndex) * -300; // 300px é a largura do item
+            const deslocamento = (itensRoleta.length * 2 + resultadoIndex) * -300;
             
             // Aplica a transição e a transformação para o giro
             roleta.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
@@ -183,10 +194,10 @@
                 setTimeout(() => {
                     roleta.style.transition = 'none';
                     roleta.style.transform = `translateX(0)`;
-                    gerarItensRoleta();
+                    gerarItensRoleta(); // Volta a roleta para a versão original
                     botoesAposta.forEach(btn => btn.disabled = false);
-                }, 1000); // tempo para o usuário ver o resultado
-            }, 4000); // 4s é o tempo da animação
+                }, 1000);
+            }, 4000);
         }
 
         // Adiciona o evento de clique nos botões de aposta
