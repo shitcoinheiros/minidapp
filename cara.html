@@ -4,100 +4,101 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roleta Vira-Lata</title>
-  <style>body {
-    background-color: #f0c38e;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-}
+    <style>
+        body {
+            background-color: #f0c38e;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
 
-.container {
-    text-align: center;
-    background-color: #fff;
-    padding: 2em;
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 2em;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-h1 {
-    color: #a0522d;
-}
+        h1 {
+            color: #a0522d;
+        }
 
-.roleta-container {
-    position: relative;
-    width: 300px;
-    height: 300px;
-    margin: 2em auto;
-    border-radius: 50%;
-    border: 5px solid #a0522d;
-    overflow: hidden;
-}
+        .roleta-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 2em auto;
+            border-radius: 50%;
+            border: 5px solid #a0522d;
+            overflow: hidden;
+        }
 
-.roleta {
-    display: flex;
-    transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
+        .roleta {
+            display: flex;
+            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
 
-.roleta-item {
-    min-width: 100%;
-    height: 300px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #fff;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-}
+        .roleta-item {
+            min-width: 100%;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
 
-.roleta-ponteiro {
-    position: absolute;
-    top: -15px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 15px solid transparent;
-    border-right: 15px solid transparent;
-    border-top: 25px solid #a0522d;
-}
+        .roleta-ponteiro {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 25px solid #a0522d;
+        }
 
-.apostas {
-    margin-top: 1.5em;
-}
+        .apostas {
+            margin-top: 1.5em;
+        }
 
-.opcoes-aposta {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-}
+        .opcoes-aposta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
 
-.aposta {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 8px;
-    background-color: #e67e22;
-    color: #fff;
-    font-size: 1em;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+        .aposta {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: #e67e22;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
 
-.aposta:hover {
-    background-color: #d35400;
-}
+        .aposta:hover {
+            background-color: #d35400;
+        }
 
-#mensagem {
-    margin-top: 1.5em;
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #2c3e50;
-}</style>
-
+        #mensagem {
+            margin-top: 1.5em;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -123,80 +124,83 @@ h1 {
         </div>
     </div>
 
-    <script>const roleta = document.querySelector('.roleta');
-const botoesAposta = document.querySelectorAll('.aposta');
-const mensagem = document.getElementById('mensagem');
+    <script>
+        const roleta = document.querySelector('.roleta');
+        const botoesAposta = document.querySelectorAll('.aposta');
+        const mensagem = document.getElementById('mensagem');
 
-const itensRoleta = [
-    { nome: 'Caramelo', cor: '#e67e22' },
-    { nome: 'Vira-lata', cor: '#f1c40f' },
-    { nome: 'Salsicha', cor: '#c0392b' },
-    { nome: 'Pudim', cor: '#9b59b6' },
-    { nome: 'Bidu', cor: '#3498db' },
-    { nome: 'Doguinho', cor: '#2ecc71' }
-];
+        const itensRoleta = [
+            { nome: 'Caramelo', cor: '#e67e22' },
+            { nome: 'Vira-lata', cor: '#f1c40f' },
+            { nome: 'Salsicha', cor: '#c0392b' },
+            { nome: 'Pudim', cor: '#9b59b6' },
+            { nome: 'Bidu', cor: '#3498db' },
+            { nome: 'Doguinho', cor: '#2ecc71' }
+        ];
 
-// Gera os itens da roleta no HTML
-function gerarItensRoleta() {
-    roleta.innerHTML = '';
-    itensRoleta.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'roleta-item';
-        div.textContent = item.nome;
-        div.style.backgroundColor = item.cor;
-        roleta.appendChild(div);
-    });
-}
-
-// Lógica principal do jogo
-function girarRoleta(aposta) {
-    // Desabilita os botões para evitar múltiplas apostas
-    botoesAposta.forEach(btn => btn.disabled = true);
-    
-    // Duplica os itens para a roleta ter mais "giro"
-    const itensDuplicados = [...itensRoleta, ...itensRoleta, ...itensRoleta];
-    
-    // Escolhe um item aleatório para ser o resultado
-    const resultadoIndex = Math.floor(Math.random() * itensRoleta.length);
-    const resultado = itensRoleta[resultadoIndex];
-    
-    // Calcula o deslocamento para o item vencedor
-    const deslocamento = (itensRoleta.length * 2 + resultadoIndex) * -300; // 300px é a largura do item
-    
-    roleta.style.transform = `translateX(${deslocamento}px)`;
-    
-    // Após o giro, exibe o resultado
-    setTimeout(() => {
-        if (aposta === resultado.nome) {
-            mensagem.textContent = `Parabéns! O caramelo parou em ${resultado.nome}. Você venceu!`;
-            mensagem.style.color = 'green';
-        } else {
-            mensagem.textContent = `Que pena! O caramelo parou em ${resultado.nome}. Tente novamente.`;
-            mensagem.style.color = 'red';
+        // Gera os itens da roleta no HTML
+        function gerarItensRoleta() {
+            roleta.innerHTML = '';
+            itensRoleta.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'roleta-item';
+                div.textContent = item.nome;
+                div.style.backgroundColor = item.cor;
+                roleta.appendChild(div);
+            });
         }
-        
-        // Reseta a roleta e reabilita os botões
-        setTimeout(() => {
-            roleta.style.transition = 'none';
-            roleta.style.transform = `translateX(0)`;
-            gerarItensRoleta();
-            botoesAposta.forEach(btn => btn.disabled = false);
-        }, 1000); // tempo para o usuário ver o resultado
-        roleta.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
-    }, 4000); // 4s é o tempo da animação
-}
 
-// Adiciona o evento de clique nos botões de aposta
-botoesAposta.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const aposta = btn.getAttribute('data-valor');
-        mensagem.textContent = `Você apostou em ${aposta}. Girando a roleta...`;
-        mensagem.style.color = '#2c3e50';
-        girarRoleta(aposta);
-    });
-});
+        // Lógica principal do jogo
+        function girarRoleta(aposta) {
+            // Desabilita os botões para evitar múltiplas apostas
+            botoesAposta.forEach(btn => btn.disabled = true);
+            
+            // Duplica os itens para a roleta ter mais "giro"
+            const itensDuplicados = [...itensRoleta, ...itensRoleta, ...itensRoleta];
+            
+            // Escolhe um item aleatório para ser o resultado
+            const resultadoIndex = Math.floor(Math.random() * itensRoleta.length);
+            const resultado = itensRoleta[resultadoIndex];
+            
+            // Calcula o deslocamento para o item vencedor
+            const deslocamento = (itensRoleta.length * 2 + resultadoIndex) * -300; // 300px é a largura do item
+            
+            // Aplica a transição e a transformação para o giro
+            roleta.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
+            roleta.style.transform = `translateX(${deslocamento}px)`;
+            
+            // Após o giro, exibe o resultado
+            setTimeout(() => {
+                if (aposta === resultado.nome) {
+                    mensagem.textContent = `Parabéns! O caramelo parou em ${resultado.nome}. Você venceu!`;
+                    mensagem.style.color = 'green';
+                } else {
+                    mensagem.textContent = `Que pena! O caramelo parou em ${resultado.nome}. Tente novamente.`;
+                    mensagem.style.color = 'red';
+                }
+                
+                // Reseta a roleta e reabilita os botões
+                setTimeout(() => {
+                    roleta.style.transition = 'none';
+                    roleta.style.transform = `translateX(0)`;
+                    gerarItensRoleta();
+                    botoesAposta.forEach(btn => btn.disabled = false);
+                }, 1000); // tempo para o usuário ver o resultado
+            }, 4000); // 4s é o tempo da animação
+        }
 
-// Inicializa a roleta ao carregar a página
-document.addEventListener('DOMContentLoaded', gerarItensRoleta);</script>
+        // Adiciona o evento de clique nos botões de aposta
+        botoesAposta.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const aposta = btn.getAttribute('data-valor');
+                mensagem.textContent = `Você apostou em ${aposta}. Girando a roleta...`;
+                mensagem.style.color = '#2c3e50';
+                girarRoleta(aposta);
+            });
+        });
+
+        // Inicializa a roleta ao carregar a página
+        document.addEventListener('DOMContentLoaded', gerarItensRoleta);
+    </script>
 </body>
 </html>
