@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Vira-Lata Caramelo Runner</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: linear-gradient(to top, #87CEEB, #ffffff);
+      font-family: Arial, sans-serif;
+    }
+
+    canvas {
+      display: block;
+      margin: auto;
+      background: #d2b48c;
+      border: 3px solid #000;
+    }
+
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #222;
+      background: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 2px solid #000;
+    }
+  </style>
+</head>
+<body>
+  <div id="score">Pontos: 0</div>
+  <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Vira-Lata Caramelo
+    const caramelo = {
+      x: 50,
+      y: 300,
+      width: 50,
+      height: 50,
+      color: "#c68642",
+      dy: 0,
+      gravity: 0.8,
+      jumpPower: -12,
+      onGround: true
+    };
+
+    // Ossos e obstáculos
+    let bones = [];
+    let obstacles = [];
+    let score = 0;
+    let gameSpeed = 3;
+
+    function drawCaramelo() {
+      ctx.fillStyle = caramelo.color;
+      ctx.fillRect(caramelo.x, caramelo.y, caramelo.width, caramelo.height);
+    }
+
+    function drawBones() {
+      ctx.fillStyle = "white";
+      bones.forEach(bone => {
+        ctx.beginPath();
+        ctx.arc(bone.x, bone.y, bone.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    function drawObstacles() {
+      ctx.fillStyle = "black";
+      obstacles.forEach(obs => {
+        ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+      });
+    }
+
+    function updateCaramelo() {
+      caramelo.y += caramelo.dy;
+      caramelo.dy += caramelo.gravity;
+
+      if (caramelo.y + caramelo.height >= canvas.height - 50) {
+        caramelo.y = canvas.height - 50 - caramelo.height;
+        caramelo.dy = 0;
+        caramelo.onGround = true;
+      }
+    }
+
+    function spawnBone() {
+      bones.push({ x: canvas.width, y: Math.random() * 200 + 100, radius: 10 });
+    }
+
+    function spawnObstacle() {
+      obstacles.push({
+        x: canvas.width,
+        y: canvas.height - 50,
+        width: 30,
+        height: 50
+      });
+    }
+
+    function updateBones() {
+      bones.forEach((bone, index) => {
+        bone.x -= gameSpeed;
+        if (bone.x < 0) bones.splice(index, 1);
+
+        // Colisão com o caramelo
+        if (
+          caramelo.x < bone.x + bone.radius &&
+          caramelo.x + caramelo.width > bone.x - bone.radius &&
+          caramelo.y < bone.y + bone.radius &&
+          caramelo.y + caramelo.height > bone.y - bone.radius
+        ) {
+          score++;
+          document.getElementById("score").innerText = "Pontos: " + score;
+          bones.splice(index, 1);
+        }
+      });
+    }
+
+    function updateObstacles() {
+      obstacles.forEach((obs, index) => {
+        obs.x -= gameSpeed;
+        if (obs.x < 0) obstacles.splice(index, 1);
+
+        // Colisão com o caramelo -> Game Over
+        if (
+          caramelo.x < obs.x + obs.width &&
+          caramelo.x + caramelo.width > obs.x &&
+          caramelo.y < obs.y + obs.height &&
+          caramelo.y + caramelo.height > obs.y
+        ) {
+          alert("Game Over! Pontos: " + score);
+          document.location.reload();
+        }
+      });
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawCaramelo();
+      drawBones();
+      drawObstacles();
+
+      updateCaramelo();
+      updateBones();
+      updateObstacles();
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Spawn de ossos e obstáculos
+    setInterval(spawnBone, 2000);
+    setInterval(spawnObstacle, 3000);
+
+    // Pular com espaço
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && caramelo.onGround) {
+        caramelo.dy = caramelo.jumpPower;
+        caramelo.onGround = false;
+      }
+    });
+
+    gameLoop();
+  </script>
+</body>
+</html>
