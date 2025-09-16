@@ -37,10 +37,10 @@
             gap: 10px;
             margin: 2em 0;
             overflow: hidden;
-            height: 300px;
+            height: 300px; /* Altura de 3 símbolos */
         }
 
-        .coluna {
+        .carretel {
             width: 100px;
             height: 100%;
             border: 3px solid #a0522d;
@@ -48,13 +48,12 @@
             background-color: #fdf5e6;
             position: relative;
             overflow: hidden;
-            transform: translateY(0);
-            transition: transform 1.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+            /* A transição será adicionada via JavaScript */
         }
 
         .simbolo {
             width: 100%;
-            height: 100px;
+            height: 100px; /* Altura de um símbolo */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -70,7 +69,7 @@
             margin: 1.5em 0;
         }
 
-        #btn-spin {
+        #btn-girar {
             padding: 15px 30px;
             font-size: 1.5em;
             font-weight: bold;
@@ -83,13 +82,13 @@
             transition: background-color 0.3s, transform 0.1s;
         }
 
-        #btn-spin:active {
+        #btn-girar:active {
             background-color: #d35400;
             transform: translateY(2px);
             box-shadow: 0 3px #d35400;
         }
 
-        #btn-spin:disabled {
+        #btn-girar:disabled {
             background-color: #ccc;
             cursor: not-allowed;
             box-shadow: none;
@@ -111,12 +110,12 @@
     <div class="container">
         <h1>Caramelo da Sorte</h1>
         <div class="jogo-container">
-            <div class="coluna"></div>
-            <div class="coluna"></div>
-            <div class="coluna"></div>
+            <div class="carretel"></div>
+            <div class="carretel"></div>
+            <div class="carretel"></div>
         </div>
         <div class="controles">
-            <button id="btn-spin">Girar!</button>
+            <button id="btn-girar">Girar!</button>
         </div>
         <div class="placar">
             <p>Créditos: <span id="creditos">100</span></p>
@@ -124,14 +123,14 @@
         </div>
     </div>
     <script>
-        const colunas = document.querySelectorAll('.coluna');
-        const btnSpin = document.getElementById('btn-spin');
+        const carretels = document.querySelectorAll('.carretel');
+        const btnGirar = document.getElementById('btn-girar');
         const creditosEl = document.getElementById('creditos');
         const mensagemEl = document.getElementById('mensagem-resultado');
-
+        
         let creditos = 100;
+        const ALTURA_SIMBOLO = 100;
 
-        // Definição dos símbolos e seus valores de pagamento
         const simbolos = [
             { nome: 'Caramelo', img: 'caramelo.png', valor: 20 },
             { nome: 'Osso', img: 'osso.png', valor: 10 },
@@ -140,42 +139,34 @@
             { nome: 'Casinha', img: 'casinha.png', valor: 1 }
         ];
 
-        // Gera e insere os símbolos nas colunas
-        function gerarSimbolos(colunaEl) {
-            colunaEl.innerHTML = '';
-            const simbolosParaGirar = [...simbolos, ...simbolos, ...simbolos, ...simbolos]; // Repete para o efeito de giro
-            simbolosParaGirar.sort(() => Math.random() - 0.5); // Embaralha a ordem
-
-            simbolosParaGirar.forEach(simbolo => {
-                const div = document.createElement('div');
-                div.className = 'simbolo';
-                const img = document.createElement('img');
-                img.src = `${simbolo.img}`; // Apenas o nome do arquivo se estiver na mesma pasta
-                img.alt = simbolo.nome;
-                div.appendChild(img);
-                colunaEl.appendChild(div);
+        function gerarSimbolosCarretel() {
+            carretels.forEach(carretel => {
+                carretel.innerHTML = '';
+                const simbolosParaGirar = [...simbolos, ...simbolos, ...simbolos, ...simbolos];
+                simbolosParaGirar.sort(() => Math.random() - 0.5);
+                simbolosParaGirar.forEach(simbolo => {
+                    const div = document.createElement('div');
+                    div.className = 'simbolo';
+                    div.innerHTML = `<img src="img/${simbolo.img}" alt="${simbolo.nome}">`;
+                    carretel.appendChild(div);
+                });
             });
         }
-
-        // Atualiza a visualização dos créditos
+        
         function atualizarCreditos() {
             creditosEl.textContent = creditos;
         }
 
-        // Verifica se há uma combinação vencedora
         function verificarVitoria() {
             const simbolosResultantes = [];
-            colunas.forEach(coluna => {
-                // Pega o símbolo que parou no centro (índice 3 na nossa lista)
-                const simbolo = coluna.querySelector(`.simbolo:nth-child(4) img`).alt; 
+            carretels.forEach(carretel => {
+                const simbolo = carretel.querySelector(`.simbolo:nth-child(4) img`).alt;
                 simbolosResultantes.push(simbolo);
             });
 
             const [s1, s2, s3] = simbolosResultantes;
             
-            // Verifica a combinação
             if (s1 === s2 && s2 === s3) {
-                // Combinação de três símbolos iguais
                 const simboloVencedor = simbolos.find(s => s.nome === s1);
                 const ganho = simboloVencedor.valor;
                 creditos += ganho;
@@ -187,50 +178,44 @@
             }
         }
 
-        // A função principal de giro
-        btnSpin.addEventListener('click', () => {
+        btnGirar.addEventListener('click', () => {
             if (creditos <= 0) {
                 mensagemEl.textContent = 'Créditos insuficientes! Recarregue a página.';
                 return;
             }
             
-            creditos -= 1; // Custo de cada giro
+            creditos -= 1;
             atualizarCreditos();
             
-            btnSpin.disabled = true;
+            btnGirar.disabled = true;
             mensagemEl.textContent = 'Girando...';
             mensagemEl.style.color = '#2c3e50';
 
-            colunas.forEach((coluna, index) => {
-                gerarSimbolos(coluna);
-                // Calcula o deslocamento para o giro
-                const deslocamento = -100 * (Math.floor(Math.random() * (simbolos.length - 1)) + simbolos.length * 3);
-                coluna.style.transform = `translateY(${deslocamento}px)`;
+            const resultados = simbolos.map(() => Math.floor(Math.random() * simbolos.length));
+
+            carretels.forEach((carretel, index) => {
+                gerarSimbolosCarretel();
+                
+                // Remove a transição para o reset ser instantâneo
+                carretel.style.transition = 'none';
+                carretel.style.transform = `translateY(-${ALTURA_SIMBOLO * 3}px)`; // Posiciona o rolo 3 símbolos acima do início
+
+                setTimeout(() => {
+                    carretel.style.transition = 'transform 2s cubic-bezier(0.25, 0.1, 0.25, 1)';
+                    // Calcula o deslocamento para o símbolo vencedor parar no centro
+                    const deslocamento = -ALTURA_SIMBOLO * (simbolos.length * 3 + resultados[index]);
+                    carretel.style.transform = `translateY(${deslocamento}px)`;
+                }, 100 + index * 150); // Delay entre os carretéis
             });
 
-            // Aguarda o giro terminar para verificar o resultado
             setTimeout(() => {
                 verificarVitoria();
-                btnSpin.disabled = false;
-                // Reseta as colunas para a posição inicial com o símbolo vencedor no centro
-                colunas.forEach(coluna => {
-                    coluna.style.transition = 'none';
-                    coluna.style.transform = 'translateY(0)';
-                });
-                // Reativa a transição para o próximo giro
-                setTimeout(() => {
-                    colunas.forEach(coluna => {
-                        coluna.style.transition = 'transform 1.5s cubic-bezier(0.25, 0.1, 0.25, 1)';
-                    });
-                }, 50);
-            }, 1500); // tempo da animação
+                btnGirar.disabled = false;
+            }, 2500); // Aguarda um pouco mais que o tempo da animação
         });
 
-        // Inicialização do jogo
-        document.addEventListener('DOMContentLoaded', () => {
-            colunas.forEach(gerarSimbolos);
-            atualizarCreditos();
-        });
+        document.addEventListener('DOMContentLoaded', gerarSimbolosCarretel);
+        document.addEventListener('DOMContentLoaded', atualizarCreditos);
     </script>
 </body>
 </html>
