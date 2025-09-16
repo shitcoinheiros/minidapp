@@ -13,17 +13,21 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* ---------------------------------------------------- */
+        /* CORREÇÃO PRINCIPAL: O BODY agora é o contêiner Flexbox */
+        /* ---------------------------------------------------- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #e6ddd5;
             height: 100vh;
+            color: #333;
+            overflow: hidden; /* Isso é crucial para evitar o scroll da página */
+            position: relative;
+            touch-action: manipulation;
+
+            /* Novo: O body se torna o contêiner flexível */
             display: flex;
             flex-direction: column;
-            color: #333;
-            overflow: hidden;
-            position: relative;
-            width: 100%;
-            touch-action: manipulation;
         }
 
         body::before {
@@ -37,10 +41,7 @@
             opacity: 0.06;
             z-index: -1;
         }
-        
-        /* ---------------------------------------------------- */
-        /* CORREÇÃO: Posicionamento fixo para o cabeçalho e rodapé */
-        /* ---------------------------------------------------- */
+
         .chat-header {
             background: #f0f0f0;
             padding: 15px 16px;
@@ -50,26 +51,20 @@
             min-height: 70px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             z-index: 10;
-            
-            /* Novo: Fixa o cabeçalho no topo */
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
+            flex-shrink: 0; /* Impede que o cabeçalho encolha */
         }
         
+        /* ---------------------------------------------------- */
+        /* CORREÇÃO PRINCIPAL: O contêiner de mensagens preenche */
+        /* ---------------------------------------------------- */
         .chat-messages {
-            /* Novo: Ajusta o espaçamento para evitar que as mensagens fiquem por baixo dos elementos fixos */
-            padding: 85px 10px 85px 10px;
-            overflow-y: auto;
+            flex-grow: 1; /* Permite que o contêiner de mensagens cresça para preencher o espaço */
+            overflow-y: auto; /* Adiciona a barra de rolagem apenas aqui */
+            padding: 15px 10px;
             display: flex;
             flex-direction: column;
             gap: 5px;
             background: transparent;
-            
-            /* Novo: Permite que a área de mensagens cresça para ocupar todo o espaço */
-            flex-grow: 1;
         }
 
         .chat-input-container {
@@ -80,16 +75,12 @@
             align-items: center;
             min-height: 62px;
             z-index: 10;
-            
-            /* Novo: Fixa a área de input no rodapé */
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
+            flex-shrink: 0; /* Impede que o input encolha */
         }
         
-        /* Ajustes adicionais para o chat */
+        /* ---------------------------------------------------- */
+        /* AJUSTES PARA COMPLEMENTAR A CORREÇÃO PRINCIPAL */
+        /* ---------------------------------------------------- */
         .back-button {
             background: none;
             border: none;
@@ -554,20 +545,15 @@
                 }
             });
             
-            // Scroll para o final da conversa quando o teclado é ativado
-            userInput.addEventListener('focus', () => {
-                setTimeout(() => {
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }, 100);
-            });
-
             // Focar no input quando clicar em qualquer área da conversa
             chatMessages.addEventListener('click', function() {
                 userInput.focus();
             });
             
+            // Atualizar o timestamp inicial
             document.getElementById('timestamp').textContent = getCurrentTime();
             
+            // Simular status online
             setInterval(() => {
                 statusIndicator.textContent = 'Online';
                 statusIndicator.style.color = '#667781';
