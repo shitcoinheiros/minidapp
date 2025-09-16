@@ -2,80 +2,126 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IA Au Au - Mobile Fullscreen</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IA Au Au - WhatsApp Style</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-            min-height: 100vh;
+            background: #e6ddd5;
+            height: 100vh;
             margin: 0;
             color: #333;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            touch-action: manipulation;
+        }
+        
+        /* Efeito de background do WhatsApp */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 极 2 2z' fill='%23000000' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.06;
+            z-index: -1;
         }
         
         .chat-container {
             width: 100%;
-            height: 100vh;
-            background-color: #fff;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            background: rgba(230, 221, 213, 0.8);
         }
         
+        /* Cabeçalho no estilo WhatsApp */
         .chat-header {
-            background: linear-gradient(90deg, #4b6cb7, #182848);
-            color: white;
-            padding: 18px 20px;
-            text-align: center;
-            font-size: 1.2em;
-            font-weight: bold;
-            position: relative;
+            background: #f0f0f0;
+            padding: 15px 16px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .chat-header .logo {
-            margin-right: 10px;
-            font-size: 1.2em;
+            border-bottom: 1px solid #e0e0e0;
+            min-height: 70px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .back-button {
-            position: absolute;
-            left: 15px;
             background: none;
             border: none;
-            color: white;
-            font-size: 1.2em;
+            color: #075e54;
+            font-size: 1.4em;
+            margin-right: 15px;
             cursor: pointer;
         }
         
+        .profile-pic {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #075e54;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5em;
+            margin-right: 15px;
+        }
+        
+        .profile-info {
+            flex: 1;
+        }
+        
+        .profile-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #000;
+            margin-bottom: 3px;
+        }
+        
+        .profile-status {
+            font-size: 0.85em;
+            color: #667781;
+        }
+        
+        .header-icons {
+            display: flex;
+            gap: 15px;
+            color: #54656f;
+            font-size: 1.2em;
+        }
+        
+        /* Área de mensagens */
         .chat-messages {
             flex: 1;
-            padding: 15px;
+            padding: 15px 10px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            background: #f9f9f9;
+            gap: 5px;
+            background: transparent;
         }
         
         .message {
-            max-width: 85%;
-            padding: 12px 15px;
-            border-radius: 18px;
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 7.5px;
             line-height: 1.4;
             position: relative;
-            animation: fadeIn 0.3s ease;
-            font-size: 0.95em;
+            animation: fadeIn 0.2s ease;
+            font-size: 16px;
+            margin-bottom: 2px;
         }
         
         @keyframes fadeIn {
@@ -85,68 +131,42 @@
         
         .user-message {
             align-self: flex-end;
-            background-color: #dcf8c6;
-            border-bottom-right-radius: 5px;
+            background: #d9fdd3;
+            border-top-right-radius: 0;
         }
         
         .ai-message {
             align-self: flex-start;
-            background-color: #fff;
-            border-bottom-left-radius: 5px;
-            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-top-left-radius: 0;
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
         }
         
-        .chat-input-container {
-            display: flex;
-            padding: 12px 15px;
-            background-color: white;
-            border-top: 1px solid #eee;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        .chat-input {
-            flex: 1;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 25px;
-            outline: none;
-            font-size: 1em;
-            background: #f0f0f0;
-        }
-        
-        .send-button {
+        /* Timestamp das mensagens */
+        .message-time {
+            font-size: 0.65em;
+            color: #667781;
+            text-align: right;
+            margin-top: 3px;
             margin-left: 10px;
-            background-color: #4b6cb7;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.2em;
-            transition: all 0.3s;
+            display: inline-block;
+            vertical-align: bottom;
         }
         
-        .send-button:hover {
-            background-color: #3a559f;
-        }
-        
+        /* Indicador de digitação */
         .typing-indicator {
             display: none;
             align-self: flex-start;
-            background-color: #fff;
-            padding: 12px 15px;
+            background: #fff;
+            padding: 10px 13px;
             border-radius: 18px;
-            margin-bottom: 5px;
-            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+            margin: 5px 0 10px 10px;
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
         }
         
         .typing-indicator span {
-            height: 8px;
-            width: 8px;
+            height: 7px;
+            width: 7px;
             float: left;
             margin: 0 2px;
             background-color: #9E9EA1;
@@ -176,13 +196,85 @@
             }
         }
         
-        .timestamp {
-            font-size: 0.65em;
-            color: #999;
-            margin-top: 5px;
-            text-align: right;
+        /* Área de entrada de mensagens - FIXADA NO RODAPÉ */
+        .chat-input-container {
+            display: flex;
+            padding: 10px 12px;
+            background-color: #f0f0f0;
+            border-top: 1px solid #e0e0e0;
+            align-items: center;
+            min-height: 62px;
         }
         
+        .input-action {
+            color: #54656f;
+            font-size: 1.3em;
+            margin: 0 8px;
+        }
+        
+        .chat-input-wrapper {
+            flex: 1;
+            background: #fff;
+            border-radius: 21px;
+            display: flex;
+            align-items: center;
+            padding: 0 5px;
+            margin: 0 5px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .emoji-button {
+            background: none;
+            border: none;
+            color: #54656f;
+            font-size: 1.2em;
+            padding: 8px 5px 8px 12px;
+            cursor: pointer;
+        }
+        
+        .chat-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            padding: 10px 5px;
+            background: transparent;
+            max-height: 120px;
+            overflow-y: auto;
+            resize: none;
+        }
+        
+        .mic-button {
+            background: none;
+            border: none;
+            color: #54656f;
+            font-size: 1.2em;
+            padding: 8px 12px 8px 5px;
+            cursor: pointer;
+        }
+        
+        .send-button {
+            background: #075e54;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1em;
+            margin-left: 5px;
+            transition: all 0.3s;
+            display: none;
+        }
+        
+        .send-button.active {
+            display: flex;
+        }
+        
+        /* Cursor de digitação */
         .cursor {
             display: inline-block;
             width: 6px;
@@ -198,101 +290,122 @@
             50% { opacity: 0; }
         }
         
-        /* Estilo para desktop (acima de 768px) */
-        @media (min-width: 768px) {
-            body {
-                background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                padding: 20px;
+        /* Ajustes para diferentes tamanhos de tela */
+        @media (max-width: 768px) {
+            .message {
+                max-width: 85%;
+                font-size: 15px;
             }
             
-            .chat-container {
-                width: 400px;
-                height: 600px;
-                border-radius: 20px;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-                overflow: hidden;
+            .chat-header {
+                padding: 15px 12px;
             }
             
-            .back-button {
-                display: none;
+            .profile-pic {
+                width: 40px;
+                height: 40px;
+                font-size: 1.3em;
             }
         }
         
-        /* Melhorias para mobile */
-        @media (max-width: 767px) {
-            .chat-header {
-                padding: 20px 15px;
-            }
-            
-            .chat-messages {
-                padding: 15px 10px;
-            }
-            
+        @media (max-width: 480px) {
             .message {
                 max-width: 90%;
-                font-size: 0.9em;
             }
             
-            .chat-input-container {
-                padding: 15px 10px;
+            .header-icons {
+                gap: 12px;
+            }
+            
+            .input-action {
+                font-size: 1.2em;
             }
         }
         
-        /* Estilo para scrollbar */
+        /* Ajuste para quando o teclado estiver aberto */
+        .keyboard-open .chat-messages {
+            padding-bottom: 5px;
+        }
+        
+        /* Estilização da scrollbar */
         .chat-messages::-webkit-scrollbar {
             width: 5px;
         }
         
         .chat-messages::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: rgba(0,0,0,0.05);
             border-radius: 10px;
         }
         
         .chat-messages::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
+            background: rgba(0,0,0,0.2);
             border-radius: 10px;
         }
         
         .chat-messages::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-        
-        /* Ajustes para iOS */
-        @supports (-webkit-touch-callout: none) {
-            .chat-container {
-                height: -webkit-fill-available;
-            }
+            background: rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
     <div class="chat-container">
+        <!-- Cabeçalho no estilo WhatsApp -->
         <div class="chat-header">
-            <button class="back-button" id="back-button">
+            <button class="back-button">
                 <i class="fas fa-arrow-left"></i>
             </button>
-            <div class="logo">🤖</div>
-            Assistente Virtual Au Au
+            <div class="profile-pic">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="profile-info">
+                <div class="profile-name">Assistente Au Au</div>
+                <div class="profile-status" id="status">Online</div>
+            </div>
+            <div class="header-icons">
+                <i class="fas fa-video"></i>
+                <i class="fas fa-phone"></i>
+                <i class="fas fa-ellipsis-vertical"></i>
+            </div>
         </div>
+        
+        <!-- Área de mensagens -->
         <div class="chat-messages" id="chat-messages">
             <div class="message ai-message">
                 Olá! Sou sua assistente virtual. Como posso ajudá-lo hoje?
-                <div class="timestamp">Agora</div>
+                <span class="message-time" id="timestamp">12:00</span>
             </div>
         </div>
+        
+        <!-- Indicador de digitação -->
         <div class="typing-indicator" id="typing-indicator">
             <span></span>
             <span></span>
             <span></span>
         </div>
+        
+        <!-- Área de entrada de mensagens -->
         <div class="chat-input-container">
-            <input type="text" class="chat-input" id="user-input" placeholder="Digite sua mensagem...">
+            <div class="input-action">
+                <i class="fas fa-plus-circle"></i>
+            </div>
+            
+            <div class="chat-input-wrapper">
+                <button class="emoji-button">
+                    <i class="far fa-smile"></i>
+                </button>
+                <div class="chat-input" id="user-input" contenteditable="true" placeholder="Digite uma mensagem"></div>
+                <button class="mic-button">
+                    <i class="fas fa-microphone"></i>
+                </button>
+            </div>
+            
             <button class="send-button" id="send-button">
                 <i class="fas fa-paper-plane"></i>
             </button>
+            
+            <div class="input-action">
+                <i class="fas fa-camera"></i>
+            </div>
         </div>
     </div>
 
@@ -302,7 +415,38 @@
             const userInput = document.getElementById('user-input');
             const sendButton = document.getElementById('send-button');
             const typingIndicator = document.getElementById('typing-indicator');
-            const backButton = document.getElementById('back-button');
+            const statusIndicator = document.getElementById('status');
+            
+            // Configurar placeholder para contenteditable
+            userInput.setAttribute('placeholder', 'Digite uma mensagem');
+            
+            // Verificar se o conteúdo está vazio para mostrar o placeholder
+            function checkPlaceholder() {
+                if (userInput.textContent.trim() === '') {
+                    userInput.classList.add('placeholder');
+                    if (!document.querySelector('.input-placeholder')) {
+                        const placeholder = document.createElement('div');
+                        placeholder.className = 'input-placeholder';
+                        placeholder.textContent = 'Digite uma mensagem';
+                        placeholder.style.cssText = 'position:absolute; color:#999; pointer-events:none;';
+                        userInput.parentNode.style.position = 'relative';
+                        userInput.parentNode.appendChild(placeholder);
+                    }
+                } else {
+                    userInput.classList.remove('placeholder');
+                    const placeholder = document.querySelector('.input-placeholder');
+                    if (placeholder) placeholder.remove();
+                    
+                    // Mostrar botão de enviar se houver texto
+                    sendButton.classList.add('active');
+                }
+            }
+            
+            // Inicializar placeholder
+            checkPlaceholder();
+            
+            // Observar mudanças no contenteditable
+            userInput.addEventListener('input', checkPlaceholder);
             
             // Função para gerar uma sequência aleatória de "Au Au Au"
             function generateRandomAu() {
@@ -335,8 +479,8 @@
                 messageElement.classList.add('message', 'user-message');
                 messageElement.textContent = message;
                 
-                const timestamp = document.createElement('div');
-                timestamp.classList.add('timestamp');
+                const timestamp = document.createElement('span');
+                timestamp.classList.add('message-time');
                 timestamp.textContent = getCurrentTime();
                 
                 messageElement.appendChild(timestamp);
@@ -350,11 +494,10 @@
                 messageElement.classList.add('message', 'ai-message');
                 
                 const messageContent = document.createElement('div');
-                messageContent.id = 'typing-message';
                 messageElement.appendChild(messageContent);
                 
-                const timestamp = document.createElement('div');
-                timestamp.classList.add('timestamp');
+                const timestamp = document.createElement('span');
+                timestamp.classList.add('message-time');
                 timestamp.textContent = getCurrentTime();
                 messageElement.appendChild(timestamp);
                 
@@ -387,12 +530,13 @@
             
             // Função para simular o processamento da IA
             function processUserInput() {
-                const message = userInput.value.trim();
+                const message = userInput.textContent.trim();
                 if (message === '') return;
                 
                 // Adiciona mensagem do usuário
                 addUserMessage(message);
-                userInput.value = '';
+                userInput.textContent = '';
+                checkPlaceholder();
                 
                 // Mostra indicador de digitação
                 typingIndicator.style.display = 'flex';
@@ -411,41 +555,42 @@
             // Event listeners
             sendButton.addEventListener('click', processUserInput);
             
-            userInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
+            userInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
                     processUserInput();
                 }
             });
             
-            // Botão de voltar (para mobile)
-            backButton.addEventListener('click', function() {
-                alert('Voltando para a página anterior...');
-                // Em um caso real, você usaria history.back() ou navegaria para outra página
-            });
+            // Detectar quando o teclado é aberto (aproximação)
+            let initialViewportHeight = window.innerHeight;
             
-            // Foca no input quando a página carrega
-            userInput.focus();
-            
-            // Previne o zoom em elementos de formulário no iOS
-            userInput.addEventListener('touchstart', function() {
-                this.style.fontSize = '16px'; // Força o tamanho de fonte para prevenir zoom
-            });
-            
-            userInput.addEventListener('touchend', function() {
+            window.addEventListener('resize', function() {
+                if (window.innerHeight < initialViewportHeight * 0.7) {
+                    document.body.classList.add('keyboard-open');
+                } else {
+                    document.body.classList.remove('keyboard-open');
+                }
+                
+                // Scroll para o final das mensagens quando o teclado abre/fecha
                 setTimeout(() => {
-                    this.style.fontSize = ''; // Restaura o tamanho de fonte
-                }, 500);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 300);
             });
             
-            // Ajusta a altura do chat para evitar problemas com a barra de endereço móvel
-            function adjustChatHeight() {
-                const chatContainer = document.querySelector('.chat-container');
-                chatContainer.style.height = window.innerHeight + 'px';
-            }
+            // Focar no input quando clicar em qualquer área da conversa
+            chatMessages.addEventListener('click', function() {
+                userInput.focus();
+            });
             
-            // Ajusta a altura inicialmente e quando a janela for redimensionada
-            adjustChatHeight();
-            window.addEventListener('resize', adjustChatHeight);
+            // Atualizar o timestamp inicial
+            document.getElementById('timestamp').textContent = getCurrentTime();
+            
+            // Simular status online
+            setInterval(() => {
+                statusIndicator.textContent = 'Online';
+                statusIndicator.style.color = '#667781';
+            }, 5000);
         });
     </script>
 </body>
