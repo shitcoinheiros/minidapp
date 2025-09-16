@@ -17,13 +17,15 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #e6ddd5;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
             color: #333;
             overflow: hidden;
             position: relative;
             width: 100%;
             touch-action: manipulation;
+            
+            /* Melhoria: Use flexbox para layout de coluna */
+            display: flex;
+            flex-direction: column;
         }
 
         body::before {
@@ -38,9 +40,7 @@
             z-index: -1;
         }
         
-        /* ---------------------------------------------------- */
-        /* CORREÇÃO: Posicionamento fixo para o cabeçalho e rodapé */
-        /* ---------------------------------------------------- */
+        /* O cabeçalho e o rodapé não precisam mais de 'position: fixed' */
         .chat-header {
             background: #f0f0f0;
             padding: 15px 16px;
@@ -50,26 +50,20 @@
             min-height: 70px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             z-index: 10;
-            
-            /* Novo: Fixa o cabeçalho no topo */
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
+            /* Garante que o cabeçalho não encolha */
+            flex-shrink: 0;
         }
         
         .chat-messages {
-            /* Novo: Ajusta o espaçamento para evitar que as mensagens fiquem por baixo dos elementos fixos */
-            padding: 85px 10px 85px 10px;
+            /* Permite que o contêiner de mensagens cresça para ocupar o espaço restante */
+            flex-grow: 1;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 5px;
             background: transparent;
-            
-            /* Novo: Permite que a área de mensagens cresça para ocupar todo o espaço */
-            flex-grow: 1;
+            /* Adicione um padding geral para as mensagens */
+            padding: 10px; 
         }
 
         .chat-input-container {
@@ -80,13 +74,8 @@
             align-items: center;
             min-height: 62px;
             z-index: 10;
-            
-            /* Novo: Fixa a área de input no rodapé */
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
+            /* Garante que o rodapé não encolha */
+            flex-shrink: 0;
         }
         
         /* Ajustes adicionais para o chat */
@@ -522,7 +511,7 @@
             function getCurrentTime() {
                 const now = new Date();
                 return now.getHours().toString().padStart(2, '0') + ':' + 
-                        now.getMinutes().toString().padStart(2, '0');
+                       now.getMinutes().toString().padStart(2, '0');
             }
             
             // Função para simular o processamento da IA
