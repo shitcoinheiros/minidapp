@@ -33,11 +33,15 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M20 10l-2.93-2.93a5 5 0 0 0-7.07 0l-1.07 1.07a5 5 0 0 0 0 7.07l2.93 2.93a5 5 0 0 0 7.07 0l1.07-1.07a5 5 0 0 0 0-7.07zM20 10l2.93 2.93a5 5 0 0 0 7.07 0l1.07-1.07a5 5 0 0 0 0-7.07l-2.93-2.93a5 5 0 0 0-7.07 0l-1.07 1.07a5 5 0 0 0 0 7.07z' fill='%23000000' fill-opacity='0.08'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 30 C15 35, 15 45, 20 50 C25 55, 25 65, 20 70 L80 70 C75 65, 75 55, 80 50 C85 45, 85 35, 80 30 Z' fill='%23000000' fill-opacity='0.05'/%3E%3C/svg%3E");
             opacity: 0.06;
             z-index: -1;
+            background-size: 80px 80px;
         }
         
+        /* ---------------------------------------------------- */
+        /* CORREÇÃO: Posicionamento fixo para o cabeçalho e rodapé */
+        /* ---------------------------------------------------- */
         .chat-header {
             background: #f0f0f0;
             padding: 15px 16px;
@@ -48,6 +52,7 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             z-index: 10;
             
+            /* Novo: Fixa o cabeçalho no topo */
             position: fixed;
             top: 0;
             left: 0;
@@ -56,6 +61,7 @@
         }
         
         .chat-messages {
+            /* Novo: Ajusta o espaçamento para evitar que as mensagens fiquem por baixo dos elementos fixos */
             padding: 85px 10px 150px 10px;
             overflow-y: auto;
             display: flex;
@@ -63,6 +69,7 @@
             gap: 5px;
             background: transparent;
             
+            /* Novo: Permite que a área de mensagens cresça para ocupar todo o espaço */
             flex-grow: 1;
         }
 
@@ -75,6 +82,7 @@
             min-height: 62px;
             z-index: 10;
             
+            /* Novo: Fixa a área de input no rodapé */
             position: fixed;
             bottom: 0;
             left: 0;
@@ -82,6 +90,7 @@
             width: 100%;
         }
         
+        /* Ajustes adicionais para o chat */
         .back-button {
             background: none;
             border: none;
@@ -513,7 +522,7 @@
             // Função para obter a hora atual formatada
             function getCurrentTime() {
                 const now = new Date();
-                return now.getHours().toString().padStart(2, '0') + ':' + 
+                return now.getHours().toString().padStart(2, '0') + ':' + 
                         now.getMinutes().toString().padStart(2, '0');
             }
             
