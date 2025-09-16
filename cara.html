@@ -173,15 +173,17 @@
             display: inline-block;
             vertical-align: bottom;
         }
-
+        
+        /* CORREÇÃO: Nova classe para o indicador de digitação */
         .typing-indicator {
-            display: none;
+            display: flex;
             align-self: flex-start;
             background: #fff;
             padding: 10px 13px;
             border-radius: 18px;
             margin: 5px 0 10px 10px;
             box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+            width: auto;
         }
 
         .typing-indicator span {
@@ -224,12 +226,11 @@
             background: #fff;
             border-radius: 21px;
             display: flex;
-            align-items: flex-end; /* Alterado para alinhar no topo quando o input cresce */
+            align-items: center;
             padding: 0 5px;
             margin: 0 5px;
             border: 1px solid #e0e0e0;
             min-height: 42px;
-            position: relative;
         }
 
         .emoji-button {
@@ -253,10 +254,8 @@
             overflow-y: auto;
             resize: none;
             min-height: 20px;
-            white-space: pre-wrap; /* Adicionado para quebras de linha */
-            word-wrap: break-word; /* Adicionado para quebras de palavras */
         }
-        
+
         .mic-button {
             background: none;
             border: none;
@@ -288,11 +287,6 @@
 
         .send-button.active {
             display: flex;
-        }
-        
-        /* Corrigido para garantir que o input e o cursor fiquem na mesma linha */
-        .ai-message .message-content p {
-            display: inline;
         }
 
         .cursor {
@@ -345,19 +339,15 @@
             background: rgba(0,0,0,0.3);
         }
 
-        /* CORREÇÃO: Posicionamento do placeholder */
         .input-placeholder {
             position: absolute;
             color: #999;
             pointer-events: none;
-            /* Usar left para posicionar com base no input e não no wrapper */
-            left: 50px; /* Alinhar com o texto do input */
-            top: 50%; /* Alinhar verticalmente */
+            top: 50%;
+            left: 50px;
             transform: translateY(-50%);
-            /* Adicionado z-index para garantir que fique atrás do texto */
-            z-index: 1;
         }
-        
+
         .profile-pic img {
             width: 50px;
             height: 50px;
@@ -387,15 +377,8 @@
     
     <div class="chat-messages" id="chat-messages">
         <div class="message ai-message">
-            <div class="message-content">
-                Oi! Sou seu caramelo virtual. O que você precisa meu patrão?
-            </div>
+            Oi! Sou seu caramelo virtual. O que você precisa meu patrão?
             <span class="message-time" id="timestamp">12:00</span>
-        </div>
-        <div class="typing-indicator" id="typing-indicator">
-            <span></span>
-            <span></span>
-            <span></span>
         </div>
     </div>
     
@@ -403,7 +386,7 @@
         <div class="input-action">
             <i class="fas fa-plus-circle"></i>
         </div>
-        <div class="chat-input-wrapper">
+        <div class="chat-input-wrapper" style="position: relative;">
             <button class="emoji-button">
                 <i class="far fa-smile"></i>
             </button>
@@ -421,7 +404,6 @@
         </div>
     </div>
     
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const chatMessages = document.getElementById('chat-messages');
@@ -429,50 +411,32 @@
             const sendButton = document.getElementById('send-button');
             const micButton = document.getElementById('mic-button');
             const inputPlaceholder = document.getElementById('input-placeholder');
-            const typingIndicator = document.getElementById('typing-indicator');
             const statusIndicator = document.getElementById('status');
             
             // Inicialmente esconder o botão de enviar e mostrar o de microfone
             sendButton.style.display = 'none';
             micButton.style.display = 'flex';
             inputPlaceholder.style.display = 'block';
-
-            // Função para ajustar a posição do placeholder com base no scroll do input
-            function updateInputPlaceholderPosition() {
-                const placeholderHeight = inputPlaceholder.offsetHeight;
-                const inputScrollTop = userInput.scrollTop;
-                // Ajusta a posição vertical do placeholder para o centro do input visível
-                const newTop = (userInput.offsetHeight / 2) - (placeholderHeight / 2) + inputScrollTop;
-                inputPlaceholder.style.top = `${newTop}px`;
-            }
-
+            
             // Verificar se o conteúdo está vazio para mostrar o placeholder
             function checkInput() {
                 if (userInput.textContent.trim() === '') {
-                    // Se estiver vazio, mostrar microfone, placeholder e esconder enviar
                     micButton.style.display = 'flex';
                     sendButton.style.display = 'none';
                     inputPlaceholder.style.display = 'block';
                 } else {
-                    // Se tiver conteúdo, mostrar enviar e esconder microfone e placeholder
                     micButton.style.display = 'none';
                     sendButton.style.display = 'flex';
                     inputPlaceholder.style.display = 'none';
                 }
-                // Adicionalmente, ajusta a altura do input para caber o texto
-                userInput.style.height = 'auto'; // Reset para recalcular a altura
-                userInput.style.height = userInput.scrollHeight + 'px';
             }
             
             // Inicializar
             checkInput();
             
             // Observar mudanças no contenteditable
-            userInput.addEventListener('input', function() {
-                checkInput();
-                updateInputPlaceholderPosition();
-            });
-
+            userInput.addEventListener('input', checkInput);
+            
             // Focar no input quando clicar na área de placeholder
             inputPlaceholder.addEventListener('click', function() {
                 userInput.focus();
@@ -515,13 +479,12 @@
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
             
-            // Função para adicionar mensagem da IA com efeito de digitação e renderização de Markdown
+            // Função para adicionar mensagem da IA com efeito de digitação
             function addAIMessageWithTypingEffect(message) {
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message', 'ai-message');
                 
                 const messageContent = document.createElement('div');
-                messageContent.classList.add('message-content');
                 messageElement.appendChild(messageContent);
                 
                 const timestamp = document.createElement('span');
@@ -532,19 +495,16 @@
                 chatMessages.appendChild(messageElement);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 
-                const speed = 40;
                 let i = 0;
-                
-                // Utiliza a biblioteca marked.js para renderizar o Markdown
-                const finalMessage = marked.parse(message);
+                const speed = 40;
                 
                 function typeWriter() {
-                    if (i < finalMessage.length) {
-                        messageContent.innerHTML = finalMessage.substring(0, i + 1) + '<span class="cursor"></span>';
+                    if (i < message.length) {
+                        messageContent.innerHTML = message.substring(0, i + 1) + '<span class="cursor"></span>';
                         i++;
                         setTimeout(typeWriter, speed);
                     } else {
-                        messageContent.innerHTML = finalMessage;
+                        messageContent.innerHTML = message;
                     }
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 }
@@ -568,11 +528,16 @@
                 userInput.textContent = '';
                 checkInput();
                 
-                typingIndicator.style.display = 'flex';
+                // CRIAÇÃO DINÂMICA DO INDICADOR DE DIGITAÇÃO
+                const typingIndicator = document.createElement('div');
+                typingIndicator.classList.add('typing-indicator');
+                typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+                chatMessages.appendChild(typingIndicator);
+
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 
                 setTimeout(() => {
-                    typingIndicator.style.display = 'none';
+                    chatMessages.removeChild(typingIndicator);
                     
                     const response = generateRandomAu();
                     addAIMessageWithTypingEffect(response);
@@ -600,10 +565,8 @@
                 userInput.focus();
             });
             
-            // Exibir a hora inicial da mensagem
             document.getElementById('timestamp').textContent = getCurrentTime();
             
-            // Simular o status online
             setInterval(() => {
                 statusIndicator.textContent = 'Online';
                 statusIndicator.style.color = '#667781';
