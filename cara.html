@@ -1,101 +1,286 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IA Au Au</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .chat {
-      width: 400px;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .messages {
-      flex: 1;
-      padding: 10px;
-      overflow-y: auto;
-    }
-    .msg {
-      margin: 5px 0;
-      padding: 8px 12px;
-      border-radius: 8px;
-      max-width: 80%;
-    }
-    .user {
-      background: #007bff;
-      color: #fff;
-      align-self: flex-end;
-    }
-    .bot {
-      background: #e5e5e5;
-      color: #000;
-      align-self: flex-start;
-    }
-    .input-area {
-      display: flex;
-      border-top: 1px solid #ccc;
-    }
-    input {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      outline: none;
-    }
-    button {
-      padding: 10px;
-      border: none;
-      background: #007bff;
-      color: #fff;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA Au Au</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+        
+        .chat-container {
+            width: 400px;
+            height: 600px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: linear-gradient(90deg, #4b6cb7, #182848);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            position: relative;
+        }
+        
+        .chat-header::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid #182848;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 12px 15px;
+            border-radius: 18px;
+            line-height: 1.4;
+            position: relative;
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background-color: #dcf8c6;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .ai-message {
+            align-self: flex-start;
+            background-color: #f0f0f0;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            font-size: 1em;
+        }
+        
+        .chat-input button {
+            margin-left: 10px;
+            background-color: #4b6cb7;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em;
+            transition: background-color 0.3s;
+        }
+        
+        .chat-input button:hover {
+            background-color: #3a559f;
+        }
+        
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background-color: #f0f0f0;
+            padding: 12px 15px;
+            border-radius: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            float: left;
+            margin: 0 1px;
+            background-color: #9E9EA1;
+            display: block;
+            border-radius: 50%;
+            opacity: 0.4;
+        }
+        
+        .typing-indicator span:nth-of-type(1) {
+            animation: typing 1s infinite;
+        }
+        
+        .typing-indicator span:nth-of-type(2) {
+            animation: typing 1s infinite 0.33s;
+        }
+        
+        .typing-indicator span:nth-of-type(3) {
+            animation: typing 1s infinite 0.66s;
+        }
+        
+        @keyframes typing {
+            0%, 100% {
+                opacity: 0.4;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+        
+        .timestamp {
+            font-size: 0.7em;
+            color: #999;
+            margin-top: 5px;
+            text-align: right;
+        }
+    </style>
 </head>
 <body>
-  <div class="chat">
-    <div class="messages" id="messages"></div>
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="Digite sua pergunta...">
-      <button onclick="sendMessage()">Enviar</button>
+    <div class="chat-container">
+        <div class="chat-header">
+            Assistente Virtual
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message ai-message">
+                Olá! Sou sua assistente virtual. Como posso ajudá-lo hoje?
+                <div class="timestamp" id="timestamp">Agora</div>
+            </div>
+        </div>
+        <div class="typing-indicator" id="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Digite sua mensagem...">
+            <button id="send-button">
+                ➤
+            </button>
+        </div>
     </div>
-  </div>
 
-  <script>
-    function sendMessage() {
-      const input = document.getElementById("userInput");
-      const msgText = input.value.trim();
-      if (msgText === "") return;
-
-      // Mensagem do usuário
-      addMessage(msgText, "user");
-
-      // Resposta da IA (sempre Au Au Au)
-      setTimeout(() => {
-        addMessage("Au Au Au 🐶", "bot");
-      }, 500);
-
-      input.value = "";
-    }
-
-    function addMessage(text, sender) {
-      const messages = document.getElementById("messages");
-      const msg = document.createElement("div");
-      msg.classList.add("msg", sender);
-      msg.innerText = text;
-      messages.appendChild(msg);
-      messages.scrollTop = messages.scrollHeight;
-    }
-  </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.getElementById('chat-messages');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const typingIndicator = document.getElementById('typing-indicator');
+            
+            // Função para gerar uma sequência aleatória de "Au Au Au"
+            function generateRandomAu() {
+                const count = Math.floor(Math.random() * 5) + 3; // Entre 3 e 7 "Au"s
+                let result = '';
+                
+                for (let i = 0; i < count; i++) {
+                    // 20% de chance de ser "AU" em maiúsculo
+                    if (Math.random() < 0.2) {
+                        result += 'AU ';
+                    } else {
+                        result += 'Au ';
+                    }
+                }
+                
+                return result.trim();
+            }
+            
+            // Função para adicionar mensagem do usuário
+            function addUserMessage(message) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', 'user-message');
+                messageElement.textContent = message;
+                
+                const timestamp = document.createElement('div');
+                timestamp.classList.add('timestamp');
+                timestamp.textContent = getCurrentTime();
+                
+                messageElement.appendChild(timestamp);
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Função para adicionar mensagem da IA
+            function addAIMessage(message) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', 'ai-message');
+                messageElement.textContent = message;
+                
+                const timestamp = document.createElement('div');
+                timestamp.classList.add('timestamp');
+                timestamp.textContent = getCurrentTime();
+                
+                messageElement.appendChild(timestamp);
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Função para obter a hora atual formatada
+            function getCurrentTime() {
+                const now = new Date();
+                return now.getHours().toString().padStart(2, '0') + ':' + 
+                       now.getMinutes().toString().padStart(2, '0');
+            }
+            
+            // Função para simular o processamento da IA
+            function processUserInput() {
+                const message = userInput.value.trim();
+                if (message === '') return;
+                
+                // Adiciona mensagem do usuário
+                addUserMessage(message);
+                userInput.value = '';
+                
+                // Mostra indicador de digitação
+                typingIndicator.style.display = 'flex';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Simula tempo de processamento
+                setTimeout(() => {
+                    typingIndicator.style.display = 'none';
+                    
+                    // Gera e exibe a resposta da IA
+                    const response = generateRandomAu();
+                    addAIMessage(response);
+                }, 1000 + Math.random() * 1000); // Entre 1 e 2 segundos
+            }
+            
+            // Event listeners
+            sendButton.addEventListener('click', processUserInput);
+            
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    processUserInput();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
