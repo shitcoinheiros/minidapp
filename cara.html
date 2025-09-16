@@ -14,26 +14,24 @@
         }
 
         /* ---------------------------------------------------- */
-        /* ALTERAÇÃO 1: Fundo da página e layout principal */
-        /* Usar display: flex para a página, com direção de coluna */
-        /* Garante que o conteúdo ocupe a altura total da tela */
+        /* APLICANDO FLEXBOX NO BODY PARA CONTROLAR O LAYOUT */
         /* ---------------------------------------------------- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #e6ddd5;
-            height: 100vh;
-            display: flex; /* Adicionado */
-            flex-direction: column; /* Adicionado */
+            height: 100vh; /* Garante que o body ocupe 100% da altura da tela */
+            display: flex; /* Define o body como um contêiner flexível */
+            flex-direction: column; /* Organiza os filhos em uma coluna */
             color: #333;
-            overflow: hidden; /* Remove o scroll principal do body */
-            position: relative; /* Mudado para relative */
+            overflow: hidden; /* Evita o scroll principal da página */
+            position: relative;
             width: 100%;
             touch-action: manipulation;
         }
 
         body::before {
             content: "";
-            position: absolute; /* Mudado para absolute */
+            position: absolute;
             top: 0;
             left: 0;
             right: 0;
@@ -42,21 +40,11 @@
             opacity: 0.06;
             z-index: -1;
         }
-
-        .chat-container {
-            width: 100%;
-            /* ---------------------------------------------------- */
-            /* REMOÇÃO 1: height: 100% no .chat-container */
-            /* Isso não é mais necessário, já que o body é um flex container */
-            /* ---------------------------------------------------- */
-            display: flex;
-            flex-direction: column;
-            background: rgba(230, 221, 213, 0.8);
-            /* ---------------------------------------------------- */
-            /* Adicionei esta regra para dar um espaço ao topo, se necessário */
-            /* min-height: 100vh; */
-            /* ---------------------------------------------------- */
-        }
+        
+        /* ---------------------------------------------------- */
+        /* REMOÇÃO: A classe .chat-container não é mais necessária */
+        /* Os elementos são filhos diretos do body */
+        /* ---------------------------------------------------- */
 
         .chat-header {
             background: #f0f0f0;
@@ -66,10 +54,7 @@
             border-bottom: 1px solid #e0e0e0;
             min-height: 70px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            flex-shrink: 0;
-            /* ---------------------------------------------------- */
-            /* Adicionado z-index para garantir que fique acima das mensagens */
-            /* ---------------------------------------------------- */
+            flex-shrink: 0; /* Impede que o cabeçalho encolha */
             z-index: 10;
         }
 
@@ -119,14 +104,12 @@
         }
 
         /* ---------------------------------------------------- */
-        /* ALTERAÇÃO 2: A área de mensagens agora usa flex-grow */
-        /* Isso faz com que ela preencha todo o espaço vertical disponível */
-        /* E overflow: auto cria o scroll apenas dentro dessa área */
+        /* CORREÇÃO: A área de mensagens vai preencher o espaço restante */
         /* ---------------------------------------------------- */
         .chat-messages {
-            flex: 1; /* Permite que a área de mensagens cresça e ocupe o espaço restante */
+            flex: 1; /* Permite que a área de mensagens cresça para ocupar todo o espaço disponível */
             padding: 15px 10px;
-            overflow-y: auto; /* Cria uma barra de rolagem vertical */
+            overflow-y: auto; /* Adiciona scroll apenas nessa área */
             display: flex;
             flex-direction: column;
             gap: 5px;
@@ -206,19 +189,10 @@
         }
 
         @keyframes typing {
-            0%, 100% {
-                opacity: 0.4;
-            }
-            50% {
-                opacity: 1;
-            }
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
         }
 
-        /* ---------------------------------------------------- */
-        /* ALTERAÇÃO 3: Ajuste da caixa de input */
-        /* Removido o 'position: fixed' do .input-container-wrapper */
-        /* O Flexbox já garante que ele fique no final da tela */
-        /* ---------------------------------------------------- */
         .chat-input-container {
             display: flex;
             padding: 10px 12px;
@@ -226,10 +200,7 @@
             border-top: 1px solid #e0e0e0;
             align-items: center;
             min-height: 62px;
-            flex-shrink: 0;
-            /* ---------------------------------------------------- */
-            /* Adicionado z-index para garantir que fique acima das mensagens */
-            /* ---------------------------------------------------- */
+            flex-shrink: 0; /* Impede que o contêiner de input encolha */
             z-index: 10;
         }
 
@@ -324,49 +295,20 @@
         }
 
         @media (max-width: 768px) {
-            .message {
-                max-width: 85%;
-                font-size: 15px;
-            }
-            .chat-header {
-                padding: 15px 12px;
-            }
-            .profile-pic {
-                width: 40px;
-                height: 40px;
-                font-size: 1.3em;
-            }
-            .chat-input-container {
-                padding: 8px 10px;
-            }
-            .input-action {
-                margin: 0 6px;
-                font-size: 1.2em;
-            }
-            .chat-input-wrapper {
-                margin: 0 4px;
-            }
+            .message { max-width: 85%; font-size: 15px; }
+            .chat-header { padding: 15px 12px; }
+            .profile-pic { width: 40px; height: 40px; font-size: 1.3em; }
+            .chat-input-container { padding: 8px 10px; }
+            .input-action { margin: 0 6px; font-size: 1.2em; }
+            .chat-input-wrapper { margin: 0 4px; }
         }
 
         @media (max-width: 480px) {
-            .message {
-                max-width: 90%;
-            }
-            .header-icons {
-                gap: 12px;
-            }
-            .input-action {
-                font-size: 1.1em;
-                margin: 0 4px;
-            }
-            .emoji-button, .mic-button {
-                padding: 6px 3px;
-            }
-            .send-button {
-                width: 32px;
-                height: 32px;
-                font-size: 1em;
-            }
+            .message { max-width: 90%; }
+            .header-icons { gap: 12px; }
+            .input-action { font-size: 1.1em; margin: 0 4px; }
+            .emoji-button, .mic-button { padding: 6px 3px; }
+            .send-button { width: 32px; height: 32px; font-size: 1em; }
         }
 
         .keyboard-open .chat-messages {
@@ -400,20 +342,6 @@
             transform: translateY(-50%);
         }
 
-        /* ---------------------------------------------------- */
-        /* REMOÇÃO 2: Este bloco foi completamente removido */
-        /* A funcionalidade de fixar o input agora é gerenciada pelo Flexbox */
-        /* ---------------------------------------------------- */
-        /* .input-container-wrapper {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #f0f0f0;
-            border-top: 1px solid #e0e0e0;
-            z-index: 1000;
-        } */
-        
         .profile-pic img {
             width: 50px;
             height: 50px;
@@ -452,7 +380,7 @@
             <span></span>
         </div>
     </div>
-
+    
     <div class="chat-input-container">
         <div class="input-action">
             <i class="fas fa-plus-circle"></i>
@@ -476,7 +404,6 @@
     </div>
     
     <script>
-        // O restante do seu script JavaScript permanece o mesmo.
         document.addEventListener('DOMContentLoaded', function() {
             const chatMessages = document.getElementById('chat-messages');
             const userInput = document.getElementById('user-input');
