@@ -41,29 +41,35 @@
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
-    // Vira-Lata Caramelo
+    // ---- SPRITE DO CARAMEL0 ----
+    const sprite = new Image();
+    sprite.src =
+      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJAAAABACAYAAAD0u07/AAAEsElEQVR4nO3bP2sUQRjH8f8SSG8hoD1yqCGFZBEx+QeSgukSjqUp0t0lyhxgVg+2QiQfUEERQ9MCtIuIlHEgJeAI1sPCDBZqv7mve2d0zOzP77szcz+9svO3NmZn/OsXzdPB7Rr4q7wEc3XIoYyMWRdgMkBtQ2cApRHsJuECaJHQk8q0nIfWgk8L0KnU7G3wAkYrcz3jUDusUpwcYAJbA6Lvk5jaYAdghRoPvZqxA5j6Q3l0eCfwCuMc2m1gAi2nEKnYgV8ZlLEPRmsrJxB7YAt14P3BoC7AH7xGVtrH6nALH+Ap0sFZwA6pENLL8bD6z1k7ArsILmVgv8FgVkMslrYUyZqAWy3AHkOeQQaY9w+8iG1nOJPSbhs+AIpkeCPrIpu4NANvFODAH1GR5mu2mTwL9o6R6H3TFhLUPmAtzgY4QhmLsAbV4xDNjeOHkgXGmgm1l1Lnh5Dr2B4EMI+6KQz8Jwr1V8U1LO+oD3RCXoSkO2o0rvg7B7W+jH8Us9IC2ks9IO1z8X0Hw7XyIoa5h9cMJK4Av0AI9sBajTkA7zPu0gB5uIJixt0H9e5HOBeCMMZjSji2ApwM9kvzCfp5Afm1o4+3XgHj98BqMv0tqAPzF2O7UAP8Zn18BfU4mbV5bDvJ6AOs1qedg16Bi8nJZcnEHo5L0FQ4PE5zGEZlMnGnmD0nKiMnpCjwfpLrwfJIFZ6Y5zIoXwC5N+2Bk7GybzYZG1wWdk/LWAn+3lGAn5Y7jQDLsmF6j5C9AYR8FvjYtYQzPgmWzM7m8ep+fvwEKphE0PAeSjbwwGZSeCfUoU4uMK7+DJfArDNGeqQ9bnsEOn8LDPmVZn/wCqmxz+NPRs53FJ+MBZX8cbsTn6+d8P6TfzOp2AGVjLZh06ItYCVu0CvXwnMW3hSk+lY8gh9vIdUxdZm5DXOHbzwesKhfCP7XJMSOVL3kMgLta5KN02JeJ1N6v2KH3mT2bsZwmFWAnGr1AHnww2c/D3vKNje+TAjlwA2LZNYGLfwLdpNcbwFGdvDewpg5yCvU1R8gC6ylvY+UKdTboRdcgBdwDLX+PjALRFiOViAp4DPt5kNUsDK1+Veo9yDDZcT3tgH4u5HgFhX4mtntHZF+QPbfOXr1AhtkmcVOW5Ykk42NAcWW+lfncrV+XMHLG9pEmOL+jFkfdufkHYAf5BVGzN9cW8ac0oMJ/hqsrkxXUPAowk2w7ZFejPtLv6B2A7dKlmX6cHeCj2gXzg9ApL0hPo/VWZc4O3JmwbafgDi7A98YAA8n9RA3dcBTAAAAAElFTkSuQmCC";
+
+    // ---- Vira-Lata Caramelo ----
     const caramelo = {
       x: 50,
       y: 300,
-      width: 50,
-      height: 50,
-      color: "#c68642",
+      width: 64,
+      height: 64,
       dy: 0,
       gravity: 0.8,
       jumpPower: -12,
       onGround: true
     };
 
-    // Ossos e obstáculos
+    let frame = 0;
+
+    function drawCaramelo() {
+      let sx = frame * 64; // posição X do frame no sprite sheet
+      ctx.drawImage(sprite, sx, 0, 64, 64, caramelo.x, caramelo.y, caramelo.width, caramelo.height);
+    }
+
+    // ---- Ossos e obstáculos ----
     let bones = [];
     let obstacles = [];
     let score = 0;
     let gameSpeed = 3;
-
-    function drawCaramelo() {
-      ctx.fillStyle = caramelo.color;
-      ctx.fillRect(caramelo.x, caramelo.y, caramelo.width, caramelo.height);
-    }
 
     function drawBones() {
       ctx.fillStyle = "white";
@@ -110,7 +116,6 @@
         bone.x -= gameSpeed;
         if (bone.x < 0) bones.splice(index, 1);
 
-        // Colisão com o caramelo
         if (
           caramelo.x < bone.x + bone.radius &&
           caramelo.x + caramelo.width > bone.x - bone.radius &&
@@ -129,7 +134,6 @@
         obs.x -= gameSpeed;
         if (obs.x < 0) obstacles.splice(index, 1);
 
-        // Colisão com o caramelo -> Game Over
         if (
           caramelo.x < obs.x + obs.width &&
           caramelo.x + caramelo.width > obs.x &&
@@ -156,11 +160,14 @@
       requestAnimationFrame(gameLoop);
     }
 
-    // Spawn de ossos e obstáculos
+    // ---- Animação do sprite ----
+    setInterval(() => {
+      frame = (frame + 1) % 4; // 4 frames
+    }, 150);
+
     setInterval(spawnBone, 2000);
     setInterval(spawnObstacle, 3000);
 
-    // Pular com espaço
     document.addEventListener("keydown", (e) => {
       if (e.code === "Space" && caramelo.onGround) {
         caramelo.dy = caramelo.jumpPower;
