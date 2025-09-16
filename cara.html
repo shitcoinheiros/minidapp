@@ -1,484 +1,101 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caramelo da Sorte</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
-        
-        body {
-            background: linear-gradient(135deg, #f0c38e 0%, #e67e22 100%);
-            font-family: 'Arial', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            color: #8B4513;
-            overflow-x: hidden;
-        }
-
-        .container {
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.95);
-            padding: 2em;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-            width: 90%;
-            max-width: 500px;
-            position: relative;
-            overflow: hidden;
-            border: 5px solid #8B4513;
-        }
-
-        h1 {
-            font-family: 'Luckiest Guy', cursive;
-            font-size: 2.8em;
-            margin-bottom: 0.5em;
-            color: #8B4513;
-            text-shadow: 3px 3px 0 #FFD700;
-            letter-spacing: 2px;
-        }
-
-        .jogo-container {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 2em 0;
-            overflow: hidden;
-            height: 300px;
-            perspective: 800px;
-        }
-
-        .carretel {
-            width: 100px;
-            height: 100%;
-            border: 3px solid #8B4513;
-            border-radius: 15px;
-            background: linear-gradient(45deg, #fdf5e6 0%, #fae2bb 100%);
-            position: relative;
-            overflow: hidden;
-            transform-style: preserve-3d;
-            box-shadow: inset 0 0 15px rgba(139, 69, 19, 0.3), 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .carretel::before, .carretel::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 30px;
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        .carretel::before {
-            top: 0;
-            background: linear-gradient(to bottom, rgba(253, 245, 230, 1) 0%, rgba(253, 245, 230, 0) 100%);
-        }
-
-        .carretel::after {
-            bottom: 0;
-            background: linear-gradient(to top, rgba(253, 245, 230, 1) 0%, rgba(253, 245, 230, 0) 100%);
-        }
-
-        .simbolos-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            transition: transform 0.1s linear;
-        }
-
-        .simbolo {
-            width: 100%;
-            height: 100px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 3em;
-        }
-
-        .simbolo img {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            transition: transform 0.2s;
-        }
-
-        .simbolo.vencedor img {
-            animation: pulsar 0.5s infinite alternate;
-        }
-
-        .linhas-vencedoras {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        .linha {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: gold;
-            box-shadow: 0 0 10px gold, 0 0 20px gold;
-            opacity: 0;
-        }
-
-        .linha:nth-child(1) { top: 33%; }
-        .linha:nth-child(2) { top: 50%; }
-        .linha:nth-child(3) { top: 66%; }
-
-        .controles {
-            margin: 1.5em 0;
-        }
-
-        #btn-girar {
-            padding: 15px 30px;
-            font-size: 1.5em;
-            font-weight: bold;
-            border: none;
-            border-radius: 50px;
-            background: linear-gradient(to bottom, #e67e22, #d35400);
-            color: #fff;
-            cursor: pointer;
-            box-shadow: 0 7px #a84300, 0 10px 20px rgba(0, 0, 0, 0.2);
-            transition: all 0.1s;
-            font-family: 'Luckiest Guy', cursive;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            position: relative;
-            overflow: hidden;
-        }
-
-        #btn-girar::before {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            background: linear-gradient(45deg, #ff8c00, #ff0, #ff8c00);
-            z-index: -1;
-            border-radius: 50px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        #btn-girar:hover::before {
-            opacity: 0.3;
-        }
-
-        #btn-girar:active {
-            transform: translateY(5px);
-            box-shadow: 0 2px #a84300, 0 5px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        #btn-girar:disabled {
-            background: linear-gradient(to bottom, #ccc, #999);
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: translateY(5px);
-        }
-
-        .placar {
-            font-size: 1.2em;
-            font-weight: bold;
-            background: #fae2bb;
-            padding: 10px 20px;
-            border-radius: 50px;
-            display: inline-block;
-            border: 2px solid #8B4513;
-        }
-
-        #mensagem-resultado {
-            color: #c0392b;
-            margin-top: 1em;
-            min-height: 1.5em;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-
-        .efeito-moeda {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: gold;
-            border-radius: 50%;
-            pointer-events: none;
-            opacity: 0;
-        }
-
-        @keyframes girar {
-            0% { transform: translateY(0) rotateX(0); }
-            100% { transform: translateY(var(--final-pos)) rotateX(360deg); }
-        }
-
-        @keyframes pulsar {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.2); }
-        }
-
-        @keyframes aparecer {
-            0% { opacity: 0; transform: translateY(-20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes moeda {
-            0% { opacity: 1; transform: translate(0, 0) scale(1); }
-            100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.5); }
-        }
-
-        .vitoria .linha {
-            animation: piscarLinha 0.5s infinite alternate;
-        }
-
-        @keyframes piscarLinha {
-            0% { opacity: 0.3; }
-            100% { opacity: 1; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IA Au Au</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .chat {
+      width: 400px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    .msg {
+      margin: 5px 0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      max-width: 80%;
+    }
+    .user {
+      background: #007bff;
+      color: #fff;
+      align-self: flex-end;
+    }
+    .bot {
+      background: #e5e5e5;
+      color: #000;
+      align-self: flex-start;
+    }
+    .input-area {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+    }
+    button {
+      padding: 10px;
+      border: none;
+      background: #007bff;
+      color: #fff;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Caramelo da Sorte</h1>
-        <div class="jogo-container">
-            <div class="carretel">
-                <div class="simbolos-container"></div>
-                <div class="linhas-vencedoras">
-                    <div class="linha"></div>
-                    <div class="linha"></div>
-                    <div class="linha"></div>
-                </div>
-            </div>
-            <div class="carretel">
-                <div class="simbolos-container"></div>
-                <div class="linhas-vencedoras">
-                    <div class="linha"></div>
-                    <div class="linha"></div>
-                    <div class="linha"></div>
-                </div>
-            </div>
-            <div class="carretel">
-                <div class="simbolos-container"></div>
-                <div class="linhas-vencedoras">
-                    <div class="linha"></div>
-                    <div class="linha"></div>
-                    <div class="linha"></div>
-                </div>
-            </div>
-        </div>
-        <div class="controles">
-            <button id="btn-girar">Girar!</button>
-        </div>
-        <div class="placar">
-            <p>Créditos: <span id="creditos">100</span></p>
-            <p id="mensagem-resultado"></p>
-        </div>
+  <div class="chat">
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Digite sua pergunta...">
+      <button onclick="sendMessage()">Enviar</button>
     </div>
+  </div>
 
-    <!-- Efeitos sonoros (usando data URIs para evitar arquivos externos) -->
-    <audio id="som-giro" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
-    <audio id="som-vitoria" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
-    
-    <script>
-        const carretels = document.querySelectorAll('.carretel');
-        const containersSimbolos = document.querySelectorAll('.simbolos-container');
-        const btnGirar = document.getElementById('btn-girar');
-        const creditosEl = document.getElementById('creditos');
-        const mensagemEl = document.getElementById('mensagem-resultado');
-        const somGiro = document.getElementById('som-giro');
-        const somVitoria = document.getElementById('som-vitoria');
-        
-        let creditos = 100;
-        const ALTURA_SIMBOLO = 100;
-        const NUMERO_GIROS_MINIMO = 5;
-        const ATRASO_ENTRE_CARRETEIS = 300;
+  <script>
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const msgText = input.value.trim();
+      if (msgText === "") return;
 
-        const simbolos = [
-            { nome: 'Caramelo', img: 'caramelo.png', valor: 20 },
-            { nome: 'Osso', img: 'osso.png', valor: 10 },
-            { nome: 'Bolinha', img: 'bolinha.png', valor: 5 },
-            { nome: 'Coleira', img: 'coleira.png', valor: 3 },
-            { nome: 'Casinha', img: 'casinha.png', valor: 1 }
-        ];
+      // Mensagem do usuário
+      addMessage(msgText, "user");
 
-        // Pré-carregar imagens (usando placeholders para exemplo)
-        function preloadImages() {
-            simbolos.forEach(simbolo => {
-                new Image().src = simbolo.img;
-            });
-        }
+      // Resposta da IA (sempre Au Au Au)
+      setTimeout(() => {
+        addMessage("Au Au Au 🐶", "bot");
+      }, 500);
 
-        function gerarSimbolosCarretel() {
-            containersSimbolos.forEach(container => {
-                container.innerHTML = '';
-                // Criar mais símbolos para um giro mais longo
-                for (let i = 0; i < 20; i++) {
-                    const randomIndex = Math.floor(Math.random() * simbolos.length);
-                    const simbolo = simbolos[randomIndex];
-                    
-                    const div = document.createElement('div');
-                    div.className = 'simbolo';
-                    div.innerHTML = `<img src="${simbolo.img}" alt="${simbolo.nome}">`;
-                    container.appendChild(div);
-                }
-            });
-        }
-        
-        function atualizarCreditos() {
-            creditosEl.textContent = creditos;
-        }
+      input.value = "";
+    }
 
-        function criarEfeitoMoedas(quantidade) {
-            const placar = document.querySelector('.placar');
-            const placarRect = placar.getBoundingClientRect();
-            const containerRect = document.querySelector('.container').getBoundingClientRect();
-            
-            for (let i = 0; i < quantidade; i++) {
-                const moeda = document.createElement('div');
-                moeda.className = 'efeito-moeda';
-                
-                // Posição inicial aleatória na área do jogo
-                const startX = Math.random() * (containerRect.width - 100) + 50;
-                const startY = Math.random() * 200 + 100;
-                
-                // Posição final (no placar)
-                const endX = placarRect.left + placarRect.width/2 - containerRect.left;
-                const endY = placarRect.top + placarRect.height/2 - containerRect.top;
-                
-                moeda.style.left = `${startX}px`;
-                moeda.style.top = `${startY}px`;
-                moeda.style.setProperty('--tx', `${endX - startX}px`);
-                moeda.style.setProperty('--ty', `${endY - startY}px`);
-                
-                document.querySelector('.container').appendChild(moeda);
-                
-                setTimeout(() => {
-                    moeda.style.animation = `moeda 1s forwards`;
-                    
-                    // Remover após a animação
-                    setTimeout(() => {
-                        moeda.remove();
-                    }, 1000);
-                }, i * 100);
-            }
-        }
-
-        function verificarVitoria() {
-            const simbolosResultantes = [];
-            containersSimbolos.forEach(container => {
-                const simboloElement = container.children[10]; // Símbolo do meio
-                const simbolo = simboloElement.querySelector('img').alt;
-                simbolosResultantes.push(simbolo);
-            });
-
-            const [s1, s2, s3] = simbolosResultantes;
-            
-            // Remover qualquer destaque anterior
-            document.querySelectorAll('.simbolo.vencedor').forEach(el => {
-                el.classList.remove('vencedor');
-            });
-            
-            // Remover efeito de vitória dos carretéis
-            document.querySelectorAll('.carretel').forEach(el => {
-                el.classList.remove('vitoria');
-            });
-            
-            if (s1 === s2 && s2 === s3) {
-                const simboloVencedor = simbolos.find(s => s.nome === s1);
-                const ganho = simboloVencedor.valor;
-                creditos += ganho;
-                mensagemEl.textContent = `Que sorte! Três ${s1}s! Você ganhou ${ganho} créditos.`;
-                mensagemEl.style.color = 'green';
-                
-                // Tocar som de vitória
-                somVitoria.currentTime = 0;
-                somVitoria.play();
-                
-                // Destacar símbolos vencedores
-                containersSimbolos.forEach(container => {
-                    container.children[10].classList.add('vencedor');
-                });
-                
-                // Adicionar efeito de vitória aos carretéis
-                document.querySelectorAll('.carretel').forEach(el => {
-                    el.classList.add('vitoria');
-                });
-                
-                // Criar efeito de moedas
-                criarEfeitoMoedas(ganho);
-            } else {
-                mensagemEl.textContent = `Que pena, sem combinação. Tente de novo!`;
-                mensagemEl.style.color = '#c0392b';
-            }
-        }
-
-        function girarCarretel(carretel, container, resultado, index) {
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    // Tocar som de giro (reiniciar se já estiver tocando)
-                    somGiro.currentTime = 0;
-                    somGiro.play();
-                    
-                    // Remover transições anteriores
-                    container.style.transition = 'none';
-                    
-                    // Posicionar aleatoriamente para efeito visual
-                    const posInicial = -Math.floor(Math.random() * 10) * ALTURA_SIMBOLO;
-                    container.style.transform = `translateY(${posInicial}px)`;
-                    
-                    // Pequeno delay para garantir que o navegador processe a mudança
-                    setTimeout(() => {
-                        // Aplicar a animação de giro
-                        const posFinal = (NUMERO_GIROS_MINIMO * simbolos.length + resultado) * ALTURA_SIMBOLO;
-                        container.style.transition = `transform ${3 + index * 0.2}s cubic-bezier(0.16, 0.73, 0.15, 1)`;
-                        container.style.transform = `translateY(-${posFinal}px)`;
-                        
-                        // Resolver a Promise quando a animação terminar
-                        setTimeout(resolve, (3 + index * 0.2) * 1000);
-                    }, 50);
-                }, index * ATRASO_ENTRE_CARRETEIS);
-            });
-        }
-
-        btnGirar.addEventListener('click', async () => {
-            if (creditos <= 0) {
-                mensagemEl.textContent = 'Créditos insuficientes! Recarregue a página.';
-                return;
-            }
-            
-            creditos -= 1;
-            atualizarCreditos();
-            
-            btnGirar.disabled = true;
-            mensagemEl.textContent = 'Girando...';
-            mensagemEl.style.color = '#2c3e50';
-
-            // Gerar resultados aleatórios para cada carretel
-            const resultados = Array.from({length: carretels.length}, () => Math.floor(Math.random() * simbolos.length));
-            
-            // Girar cada carretel sequencialmente com atraso
-            for (let i = 0; i < carretels.length; i++) {
-                await girarCarretel(carretels[i], containersSimbolos[i], resultados[i], i);
-            }
-            
-            // Verificar o resultado após todos os giros
-            verificarVitoria();
-            btnGirar.disabled = false;
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            preloadImages();
-            gerarSimbolosCarretel();
-            atualizarCreditos();
-        });
-    </script>
+    function addMessage(text, sender) {
+      const messages = document.getElementById("messages");
+      const msg = document.createElement("div");
+      msg.classList.add("msg", sender);
+      msg.innerText = text;
+      messages.appendChild(msg);
+      messages.scrollTop = messages.scrollHeight;
+    }
+  </script>
 </body>
 </html>
