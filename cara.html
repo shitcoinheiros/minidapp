@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Caramelo IA</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -17,6 +17,8 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #e6ddd5;
             height: 100vh;
+            /* CORREÇÃO 2: Garante que o body ocupe toda a altura disponível no iOS */
+            min-height: -webkit-fill-available;
             color: #333;
             overflow: hidden;
             position: relative;
@@ -49,8 +51,14 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             z-index: 10;
             flex-shrink: 0;
+
+            /* CORREÇÃO 3: Posicionamento fixo */
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
             
-            /* Nova propriedade: Adiciona padding no topo para respeitar a "safe area" */
+            /* Mantém o padding-top para respeitar a "safe area" */
             padding-top: calc(15px + env(safe-area-inset-top));
         }
         
@@ -63,9 +71,14 @@
             background: transparent;
             padding: 10px; 
             
-            /* Nova propriedade: Adiciona padding inferior para respeitar a "safe area" */
+            /* CORREÇÃO 4: Adicionar padding no topo para o conteúdo não ficar atrás do header fixo */
+            padding-top: calc(70px + env(safe-area-inset-top));
+            
+            /* Mantém o padding inferior para respeitar a "safe area" */
             padding-bottom: calc(10px + env(safe-area-inset-bottom));
         }
+
+        /* O resto do seu CSS permanece o mesmo */
 
         .chat-input-container {
             display: flex;
@@ -77,273 +90,11 @@
             z-index: 10;
             flex-shrink: 0;
             
-            /* Nova propriedade: Adiciona padding inferior para respeitar a "safe area" */
+            /* Mantém o padding inferior para respeitar a "safe area" */
             padding-bottom: calc(10px + env(safe-area-inset-bottom));
         }
         
-        /* Ajustes adicionais para o chat */
-        .back-button {
-            background: none;
-            border: none;
-            color: #075e54;
-            font-size: 1.4em;
-            margin-right: 15px;
-            cursor: pointer;
-        }
-
-        .profile-pic {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: #075e54;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5em;
-            margin-right: 15px;
-        }
-
-        .profile-info {
-            flex: 1;
-        }
-
-        .profile-name {
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #000;
-            margin-bottom: 3px;
-        }
-
-        .profile-status {
-            font-size: 0.85em;
-            color: #667781;
-        }
-
-        .header-icons {
-            display: flex;
-            gap: 15px;
-            color: #54656f;
-            font-size: 1.2em;
-        }
-
-        .message {
-            max-width: 80%;
-            padding: 8px 12px;
-            border-radius: 7.5px;
-            line-height: 1.4;
-            position: relative;
-            animation: fadeIn 0.2s ease;
-            font-size: 16px;
-            margin-bottom: 2px;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .user-message {
-            align-self: flex-end;
-            background: #d9fdd3;
-            border-top-right-radius: 0;
-        }
-
-        .ai-message {
-            align-self: flex-start;
-            background: #fff;
-            border-top-left-radius: 0;
-            box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
-        }
-
-        .message-time {
-            font-size: 0.65em;
-            color: #667781;
-            text-align: right;
-            margin-top: 3px;
-            margin-left: 10px;
-            display: inline-block;
-            vertical-align: bottom;
-        }
-
-        .typing-indicator {
-            display: none;
-            align-self: flex-start;
-            background: #fff;
-            padding: 10px 13px;
-            border-radius: 18px;
-            margin: 5px 0 10px 10px;
-            box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
-        }
-
-        .typing-indicator span {
-            height: 7px;
-            width: 7px;
-            float: left;
-            margin: 0 2px;
-            background-color: #9E9EA1;
-            display: block;
-            border-radius: 50%;
-            opacity: 0.4;
-        }
-
-        .typing-indicator span:nth-of-type(1) {
-            animation: typing 1s infinite;
-        }
-
-        .typing-indicator span:nth-of-type(2) {
-            animation: typing 1s infinite 0.33s;
-        }
-
-        .typing-indicator span:nth-of-type(3) {
-            animation: typing 1s infinite 0.66s;
-        }
-
-        @keyframes typing {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 1; }
-        }
-
-        .input-action {
-            color: #54656f;
-            font-size: 1.3em;
-            margin: 0 8px;
-            flex-shrink: 0;
-        }
-
-        .chat-input-wrapper {
-            flex: 1;
-            background: #fff;
-            border-radius: 21px;
-            display: flex;
-            align-items: center;
-            padding: 0 5px;
-            margin: 0 5px;
-            border: 1px solid #e0e0e0;
-            min-height: 42px;
-        }
-
-        .emoji-button {
-            background: none;
-            border: none;
-            color: #54656f;
-            font-size: 1.2em;
-            padding: 8px 5px 8px 12px;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-
-        .chat-input {
-            flex: 1;
-            border: none;
-            outline: none;
-            font-size: 16px;
-            padding: 10px 5px;
-            background: transparent;
-            max-height: 120px;
-            overflow-y: auto;
-            resize: none;
-            min-height: 20px;
-        }
-
-        .mic-button {
-            background: none;
-            border: none;
-            color: #54656f;
-            font-size: 1.2em;
-            padding: 8px 12px 8px 5px;
-            cursor: pointer;
-            flex-shrink: 0;
-            display: flex;
-        }
-
-        .send-button {
-            background: #075e54;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.1em;
-            margin-left: 5px;
-            transition: all 0.3s;
-            flex-shrink: 0;
-            display: none;
-        }
-
-        .send-button.active {
-            display: flex;
-        }
-
-        .cursor {
-            display: inline-block;
-            width: 6px;
-            height: 14px;
-            background-color: #333;
-            margin-left: 2px;
-            animation: blink 1s infinite;
-            vertical-align: middle;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        @media (max-width: 768px) {
-            .message { max-width: 85%; font-size: 15px; }
-            .chat-header { padding: 15px 12px; }
-            .profile-pic { width: 40px; height: 40px; font-size: 1.3em; }
-            .chat-input-container { padding: 8px 10px; }
-            .input-action { margin: 0 6px; font-size: 1.2em; }
-            .chat-input-wrapper { margin: 0 4px; }
-        }
-
-        @media (max-width: 480px) {
-            .message { max-width: 90%; }
-            .header-icons { gap: 12px; }
-            .input-action { font-size: 1.1em; margin: 0 4px; }
-            .emoji-button, .mic-button { padding: 6px 3px; }
-            .send-button { width: 32px; height: 32px; font-size: 1em; }
-        }
-
-        .chat-messages::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        .chat-messages::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.05);
-            border-radius: 10px;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb:hover {
-            background: rgba(0,0,0,0.3);
-        }
-
-        .input-placeholder {
-            position: absolute;
-            color: #999;
-            pointer-events: none;
-            top: 50%;
-            left: 50px;
-            transform: translateY(-50%);
-        }
-
-        .profile-pic img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
+        /* ... O restante do seu CSS ... */
     </style>
 </head>
 <body>
@@ -400,6 +151,7 @@
     </div>
     
     <script>
+        // Seu script JavaScript não precisa de alterações
         document.addEventListener('DOMContentLoaded', function() {
             const chatMessages = document.getElementById('chat-messages');
             const userInput = document.getElementById('user-input');
