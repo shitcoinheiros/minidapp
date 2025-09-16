@@ -48,7 +48,7 @@
             background-color: #fdf5e6;
             position: relative;
             overflow: hidden;
-            /* A transição será adicionada via JavaScript */
+            transform: translateY(0);
         }
 
         .simbolo {
@@ -130,6 +130,7 @@
         
         let creditos = 100;
         const ALTURA_SIMBOLO = 100;
+        const NUMERO_GIROS_MINIMO = 3;
 
         const simbolos = [
             { nome: 'Caramelo', img: 'caramelo.png', valor: 20 },
@@ -142,12 +143,12 @@
         function gerarSimbolosCarretel() {
             carretels.forEach(carretel => {
                 carretel.innerHTML = '';
-                const simbolosParaGirar = [...simbolos, ...simbolos, ...simbolos, ...simbolos];
+                const simbolosParaGirar = [...simbolos, ...simbolos, ...simbolos, ...simbolos, ...simbolos, ...simbolos];
                 simbolosParaGirar.sort(() => Math.random() - 0.5);
                 simbolosParaGirar.forEach(simbolo => {
                     const div = document.createElement('div');
                     div.className = 'simbolo';
-                    div.innerHTML = `<img src="img/${simbolo.img}" alt="${simbolo.nome}">`;
+                    div.innerHTML = `<img src="${simbolo.img}" alt="${simbolo.nome}">`;
                     carretel.appendChild(div);
                 });
             });
@@ -194,28 +195,31 @@
             const resultados = simbolos.map(() => Math.floor(Math.random() * simbolos.length));
 
             carretels.forEach((carretel, index) => {
-                gerarSimbolosCarretel();
-                
                 // Remove a transição para o reset ser instantâneo
                 carretel.style.transition = 'none';
-                carretel.style.transform = `translateY(-${ALTURA_SIMBOLO * 3}px)`; // Posiciona o rolo 3 símbolos acima do início
+                // Move o carretel para uma posição aleatória, dando a impressão de um giro
+                carretel.style.transform = `translateY(${-Math.floor(Math.random() * (simbolos.length * 2)) * ALTURA_SIMBOLO}px)`;
 
+                // Pequeno atraso para a animação
                 setTimeout(() => {
+                    // Reativa a transição para o giro suave
                     carretel.style.transition = 'transform 2s cubic-bezier(0.25, 0.1, 0.25, 1)';
-                    // Calcula o deslocamento para o símbolo vencedor parar no centro
-                    const deslocamento = -ALTURA_SIMBOLO * (simbolos.length * 3 + resultados[index]);
-                    carretel.style.transform = `translateY(${deslocamento}px)`;
-                }, 100 + index * 150); // Delay entre os carretéis
+                    const finalPosition = (NUMERO_GIROS_MINIMO * simbolos.length + resultados[index]) * ALTURA_SIMBOLO;
+                    carretel.style.transform = `translateY(-${finalPosition}px)`;
+                }, 10 + index * 100);
             });
 
+            // Aguarda o giro terminar para verificar o resultado
             setTimeout(() => {
                 verificarVitoria();
                 btnGirar.disabled = false;
             }, 2500); // Aguarda um pouco mais que o tempo da animação
         });
 
-        document.addEventListener('DOMContentLoaded', gerarSimbolosCarretel);
-        document.addEventListener('DOMContentLoaded', atualizarCreditos);
+        document.addEventListener('DOMContentLoaded', () => {
+            gerarSimbolosCarretel();
+            atualizarCreditos();
+        });
     </script>
 </body>
 </html>
