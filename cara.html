@@ -399,6 +399,16 @@
             border-top: 1px solid #e0e0e0;
             z-index: 1000;
         }
+
+
+.profile-pic img {
+  width: 50px;      /* tamanho da imagem */
+  height: 50px;     /* mantém quadrado */
+  border-radius: 50%; /* deixa redondo tipo avatar */
+  object-fit: cover; /* corta a imagem sem distorcer */
+}
+
+        
     </style>
 </head>
 <body>
@@ -408,9 +418,11 @@
             <button class="back-button">
                 <i class="fas fa-arrow-left"></i>
             </button>
+            
             <div class="profile-pic">
-                <i class="fas fa-robot"></i>
-            </div>
+    <img src="https://www.freeiconspng.com/uploads/dog-png-32.jpg" alt="IA Au Au">
+</div>
+
             <div class="profile-info">
                 <div class="profile-name">Caramelo IA</div>
                 <div class="profile-status" id="status">Online</div>
@@ -425,7 +437,7 @@
         <!-- Área de mensagens -->
         <div class="chat-messages" id="chat-messages">
             <div class="message ai-message">
-                Olá! Sou sua assistente virtual. Como posso ajudá-lo hoje?
+                Oi!Sou seu caramelo virtual. O que você precisa meu patrão?
                 <span class="message-time" id="timestamp">12:00</span>
             </div>
         </div>
