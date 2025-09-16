@@ -37,10 +37,7 @@
             opacity: 0.06;
             z-index: -1;
         }
-        
-        /* ---------------------------------------------------- */
-        /* CORREÇÃO: Posicionamento fixo para o cabeçalho e rodapé */
-        /* ---------------------------------------------------- */
+        
         .chat-header {
             background: #f0f0f0;
             padding: 15px 16px;
@@ -50,25 +47,22 @@
             min-height: 70px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             z-index: 10;
-            
-            /* Novo: Fixa o cabeçalho no topo */
+            
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             width: 100%;
         }
-        
+        
         .chat-messages {
-            /* Novo: Ajusta o espaçamento para evitar que as mensagens fiquem por baixo dos elementos fixos */
             padding: 85px 10px 150px 10px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 5px;
             background: transparent;
-            
-            /* Novo: Permite que a área de mensagens cresça para ocupar todo o espaço */
+            
             flex-grow: 1;
         }
 
@@ -80,16 +74,14 @@
             align-items: center;
             min-height: 62px;
             z-index: 10;
-            
-            /* Novo: Fixa a área de input no rodapé */
+            
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             width: 100%;
         }
-        
-        /* Ajustes adicionais para o chat */
+        
         .back-button {
             background: none;
             border: none;
@@ -372,7 +364,7 @@
             <i class="fas fa-ellipsis-vertical"></i>
         </div>
     </div>
-    
+    
     <div class="chat-messages" id="chat-messages">
         <div class="message ai-message">
             Oi! Sou seu caramelo virtual. O que você precisa meu patrão?
@@ -384,7 +376,7 @@
             <span></span>
         </div>
     </div>
-    
+    
     <div class="chat-input-container">
         <div class="input-action">
             <i class="fas fa-plus-circle"></i>
@@ -406,7 +398,7 @@
             <i class="fas fa-camera"></i>
         </div>
     </div>
-    
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const chatMessages = document.getElementById('chat-messages');
@@ -416,12 +408,12 @@
             const inputPlaceholder = document.getElementById('input-placeholder');
             const typingIndicator = document.getElementById('typing-indicator');
             const statusIndicator = document.getElementById('status');
-            
+            
             // Inicialmente esconder o botão de enviar e mostrar o de microfone
             sendButton.style.display = 'none';
             micButton.style.display = 'flex';
             inputPlaceholder.style.display = 'block';
-            
+            
             // Verificar se o conteúdo está vazio para mostrar o placeholder
             function checkInput() {
                 if (userInput.textContent.trim() === '') {
@@ -436,74 +428,74 @@
                     inputPlaceholder.style.display = 'none';
                 }
             }
-            
+            
             // Inicializar
             checkInput();
-            
+            
             // Observar mudanças no contenteditable
             userInput.addEventListener('input', checkInput);
-            
+            
             // Focar no input quando clicar na área de placeholder
             inputPlaceholder.addEventListener('click', function() {
                 userInput.focus();
             });
-            
+            
             // Função para gerar uma sequência aleatória de "Au Au Au"
             function generateRandomAu() {
                 const count = Math.floor(Math.random() * 15) + 10;
                 let result = '';
-                
+                
                 const dogEmojis = ['🐕', '🐩', '🐶', '🦴'];
-                
+                
                 for (let i = 0; i < count; i++) {
                     if (Math.random() < 0.2) {
                         result += 'AU ';
                     } else {
                         result += 'Au ';
                     }
-                    
+                    
                     if (Math.random() < 0.1) {
                         result += dogEmojis[Math.floor(Math.random() * dogEmojis.length)] + ' ';
                     }
                 }
-                
+                
                 return result.trim();
             }
-            
+            
             // Função para adicionar mensagem do usuário
             function addUserMessage(message) {
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message', 'user-message');
                 messageElement.textContent = message;
-                
+                
                 const timestamp = document.createElement('span');
                 timestamp.classList.add('message-time');
                 timestamp.textContent = getCurrentTime();
-                
+                
                 messageElement.appendChild(timestamp);
                 chatMessages.appendChild(messageElement);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
-            
+            
             // Função para adicionar mensagem da IA com efeito de digitação
             function addAIMessageWithTypingEffect(message) {
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message', 'ai-message');
-                
+                
                 const messageContent = document.createElement('div');
                 messageElement.appendChild(messageContent);
-                
+                
                 const timestamp = document.createElement('span');
                 timestamp.classList.add('message-time');
                 timestamp.textContent = getCurrentTime();
                 messageElement.appendChild(timestamp);
-                
+                
                 chatMessages.appendChild(messageElement);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
-                
+                
                 let i = 0;
                 const speed = 40;
-                
+                
                 function typeWriter() {
                     if (i < message.length) {
                         messageContent.innerHTML = message.substring(0, i + 1) + '<span class="cursor"></span>';
@@ -514,46 +506,46 @@
                     }
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 }
-                
+                
                 typeWriter();
             }
-            
+            
             // Função para obter a hora atual formatada
             function getCurrentTime() {
                 const now = new Date();
                 return now.getHours().toString().padStart(2, '0') + ':' + 
                         now.getMinutes().toString().padStart(2, '0');
             }
-            
+            
             // Função para simular o processamento da IA
             function processUserInput() {
                 const message = userInput.textContent.trim();
                 if (message === '') return;
-                
+                
                 addUserMessage(message);
                 userInput.textContent = '';
                 checkInput();
-                
+                
                 typingIndicator.style.display = 'flex';
                 chatMessages.scrollTop = chatMessages.scrollHeight;
-                
+                
                 setTimeout(() => {
                     typingIndicator.style.display = 'none';
-                    
+                    
                     const response = generateRandomAu();
                     addAIMessageWithTypingEffect(response);
                 }, 1000 + Math.random() * 1000);
             }
-            
+            
             sendButton.addEventListener('click', processUserInput);
-            
+            
             userInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     processUserInput();
                 }
             });
-            
+            
             // Scroll para o final da conversa quando o teclado é ativado
             userInput.addEventListener('focus', () => {
                 setTimeout(() => {
@@ -565,9 +557,9 @@
             chatMessages.addEventListener('click', function() {
                 userInput.focus();
             });
-            
+            
             document.getElementById('timestamp').textContent = getCurrentTime();
-            
+            
             setInterval(() => {
                 statusIndicator.textContent = 'Online';
                 statusIndicator.style.color = '#667781';
