@@ -13,17 +13,14 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* ---------------------------------------------------- */
-        /* APLICANDO FLEXBOX NO BODY PARA CONTROLAR O LAYOUT */
-        /* ---------------------------------------------------- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #e6ddd5;
-            height: 100vh; /* Garante que o body ocupe 100% da altura da tela */
-            display: flex; /* Define o body como um contêiner flexível */
-            flex-direction: column; /* Organiza os filhos em uma coluna */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
             color: #333;
-            overflow: hidden; /* Evita o scroll principal da página */
+            overflow: hidden;
             position: relative;
             width: 100%;
             touch-action: manipulation;
@@ -42,10 +39,8 @@
         }
         
         /* ---------------------------------------------------- */
-        /* REMOÇÃO: A classe .chat-container não é mais necessária */
-        /* Os elementos são filhos diretos do body */
+        /* CORREÇÃO: Posicionamento fixo para o cabeçalho e rodapé */
         /* ---------------------------------------------------- */
-
         .chat-header {
             background: #f0f0f0;
             padding: 15px 16px;
@@ -54,10 +49,47 @@
             border-bottom: 1px solid #e0e0e0;
             min-height: 70px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            flex-shrink: 0; /* Impede que o cabeçalho encolha */
             z-index: 10;
+            
+            /* Novo: Fixa o cabeçalho no topo */
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+        }
+        
+        .chat-messages {
+            /* Novo: Ajusta o espaçamento para evitar que as mensagens fiquem por baixo dos elementos fixos */
+            padding: 85px 10px 85px 10px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            background: transparent;
+            
+            /* Novo: Permite que a área de mensagens cresça para ocupar todo o espaço */
+            flex-grow: 1;
         }
 
+        .chat-input-container {
+            display: flex;
+            padding: 10px 12px;
+            background-color: #f0f0f0;
+            border-top: 1px solid #e0e0e0;
+            align-items: center;
+            min-height: 62px;
+            z-index: 10;
+            
+            /* Novo: Fixa a área de input no rodapé */
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+        }
+        
+        /* Ajustes adicionais para o chat */
         .back-button {
             background: none;
             border: none;
@@ -101,19 +133,6 @@
             gap: 15px;
             color: #54656f;
             font-size: 1.2em;
-        }
-
-        /* ---------------------------------------------------- */
-        /* CORREÇÃO: A área de mensagens vai preencher o espaço restante */
-        /* ---------------------------------------------------- */
-        .chat-messages {
-            flex: 1; /* Permite que a área de mensagens cresça para ocupar todo o espaço disponível */
-            padding: 15px 10px;
-            overflow-y: auto; /* Adiciona scroll apenas nessa área */
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            background: transparent;
         }
 
         .message {
@@ -191,17 +210,6 @@
         @keyframes typing {
             0%, 100% { opacity: 0.4; }
             50% { opacity: 1; }
-        }
-
-        .chat-input-container {
-            display: flex;
-            padding: 10px 12px;
-            background-color: #f0f0f0;
-            border-top: 1px solid #e0e0e0;
-            align-items: center;
-            min-height: 62px;
-            flex-shrink: 0; /* Impede que o contêiner de input encolha */
-            z-index: 10;
         }
 
         .input-action {
@@ -311,10 +319,6 @@
             .send-button { width: 32px; height: 32px; font-size: 1em; }
         }
 
-        .keyboard-open .chat-messages {
-            padding-bottom: 5px;
-        }
-
         .chat-messages::-webkit-scrollbar {
             width: 5px;
         }
@@ -371,7 +375,7 @@
     
     <div class="chat-messages" id="chat-messages">
         <div class="message ai-message">
-            Oi!Sou seu caramelo virtual. O que você precisa meu patrão?
+            Oi! Sou seu caramelo virtual. O que você precisa meu patrão?
             <span class="message-time" id="timestamp">12:00</span>
         </div>
         <div class="typing-indicator" id="typing-indicator">
@@ -446,21 +450,18 @@
             
             // Função para gerar uma sequência aleatória de "Au Au Au"
             function generateRandomAu() {
-                const count = Math.floor(Math.random() * 15) + 10; // Entre 10 e 25 "Au"s
+                const count = Math.floor(Math.random() * 15) + 10;
                 let result = '';
                 
-                // Adiciona alguns emojis de cachorro aleatoriamente
                 const dogEmojis = ['🐕', '🐩', '🐶', '🦴'];
                 
                 for (let i = 0; i < count; i++) {
-                    // 20% de chance de ser "AU" em maiúsculo
                     if (Math.random() < 0.2) {
                         result += 'AU ';
                     } else {
                         result += 'Au ';
                     }
                     
-                    // 10% de chance de adicionar um emoji de cachorro
                     if (Math.random() < 0.1) {
                         result += dogEmojis[Math.floor(Math.random() * dogEmojis.length)] + ' ';
                     }
@@ -501,7 +502,7 @@
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 
                 let i = 0;
-                const speed = 40; // velocidade de digitação (milissegundos)
+                const speed = 40;
                 
                 function typeWriter() {
                     if (i < message.length) {
@@ -529,26 +530,21 @@
                 const message = userInput.textContent.trim();
                 if (message === '') return;
                 
-                // Adiciona mensagem do usuário
                 addUserMessage(message);
                 userInput.textContent = '';
                 checkInput();
                 
-                // Mostra indicador de digitação
                 typingIndicator.style.display = 'flex';
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 
-                // Simula tempo de processamento
                 setTimeout(() => {
                     typingIndicator.style.display = 'none';
                     
-                    // Gera e exibe a resposta da IA com efeito de digitação
                     const response = generateRandomAu();
                     addAIMessageWithTypingEffect(response);
-                }, 1000 + Math.random() * 1000); // Entre 1 e 2 segundos
+                }, 1000 + Math.random() * 1000);
             }
             
-            // Event listeners
             sendButton.addEventListener('click', processUserInput);
             
             userInput.addEventListener('keydown', function(e) {
@@ -558,44 +554,24 @@
                 }
             });
             
-            // Detectar quando o teclado é aberto (aproximação)
-            let initialViewportHeight = window.innerHeight;
-            
-            window.addEventListener('resize', function() {
-                if (window.innerHeight < initialViewportHeight * 0.7) {
-                    document.body.classList.add('keyboard-open');
-                } else {
-                    document.body.classList.remove('keyboard-open');
-                }
-                
-                // Scroll para o final das mensagens quando o teclado abre/fecha
+            // Scroll para o final da conversa quando o teclado é ativado
+            userInput.addEventListener('focus', () => {
                 setTimeout(() => {
                     chatMessages.scrollTop = chatMessages.scrollHeight;
-                }, 300);
+                }, 100);
             });
-            
+
             // Focar no input quando clicar em qualquer área da conversa
             chatMessages.addEventListener('click', function() {
                 userInput.focus();
             });
             
-            // Atualizar o timestamp inicial
             document.getElementById('timestamp').textContent = getCurrentTime();
             
-            // Simular status online
             setInterval(() => {
                 statusIndicator.textContent = 'Online';
                 statusIndicator.style.color = '#667781';
             }, 5000);
-            
-            // Garantir que a área de input esteja sempre visível
-            function ensureInputVisible() {
-                const inputContainer = document.querySelector('.chat-input-container');
-                inputContainer.style.display = 'flex';
-            }
-            
-            // Chamar a função para garantir visibilidade
-            ensureInputVisible();
         });
     </script>
 </body>
