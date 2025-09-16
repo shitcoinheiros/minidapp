@@ -3,215 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roleta Vira-Lata</title>
+    <title>Caramelo da Sorte</title>
     <style>
         body {
             background-color: #f0c38e;
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            color: #a0522d;
         }
 
         .container {
             text-align: center;
             background-color: #fff;
             padding: 2em;
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
         }
 
         h1 {
-            color: #a0522d;
+            font-size: 2.5em;
+            margin-bottom: 0.5em;
         }
 
-        .roleta-container {
-            position: relative;
-            width: 300px;
-            height: 300px;
-            margin: 2em auto;
-            border-radius: 50%;
-            border: 5px solid #a0522d;
-            overflow: hidden;
-        }
-
-        .roleta {
+        .jogo-container {
             display: flex;
-            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            justify-content: center;
+            gap: 10px;
+            margin: 2em 0;
+            overflow: hidden;
+            height: 300px;
         }
 
-        .roleta-item {
-            min-width: 100%;
-            height: 300px;
+        .coluna {
+            width: 100px;
+            height: 100%;
+            border: 3px solid #a0522d;
+            border-radius: 10px;
+            background-color: #fdf5e6;
+            position: relative;
+            overflow: hidden;
+            transform: translateY(0);
+            transition: transform 1.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .simbolo {
+            width: 100%;
+            height: 100px;
             display: flex;
             justify-content: center;
             align-items: center;
+            font-size: 3em;
+        }
+
+        .simbolo img {
+            width: 80px;
+            height: 80px;
+        }
+
+        .controles {
+            margin: 1.5em 0;
+        }
+
+        #btn-spin {
+            padding: 15px 30px;
             font-size: 1.5em;
             font-weight: bold;
-            color: #fff;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-        }
-
-        .roleta-ponteiro {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 25px solid #a0522d;
-        }
-
-        .apostas {
-            margin-top: 1.5em;
-        }
-
-        .opcoes-aposta {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .aposta {
-            padding: 10px 15px;
             border: none;
-            border-radius: 8px;
+            border-radius: 50px;
             background-color: #e67e22;
             color: #fff;
-            font-size: 1em;
             cursor: pointer;
-            transition: background-color 0.3s;
+            box-shadow: 0 5px #d35400;
+            transition: background-color 0.3s, transform 0.1s;
         }
 
-        .aposta:hover {
+        #btn-spin:active {
             background-color: #d35400;
+            transform: translateY(2px);
+            box-shadow: 0 3px #d35400;
         }
 
-        #mensagem {
-            margin-top: 1.5em;
+        #btn-spin:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .placar {
             font-size: 1.2em;
             font-weight: bold;
-            color: #2c3e50;
+        }
+
+        #mensagem-resultado {
+            color: #c0392b;
+            margin-top: 1em;
+            min-height: 1.5em;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Roleta Vira-Lata</h1>
-        <div class="roleta-container">
-            <div class="roleta">
-                </div>
-            <div class="roleta-ponteiro"></div>
+        <h1>Caramelo da Sorte</h1>
+        <div class="jogo-container">
+            <div class="coluna"></div>
+            <div class="coluna"></div>
+            <div class="coluna"></div>
         </div>
-        <div class="apostas">
-            <h2>Faça sua aposta!</h2>
-            <div class="opcoes-aposta">
-                <button class="aposta" data-valor="Caramelo">Caramelo</button>
-                <button class="aposta" data-valor="Vira-lata">Vira-lata</button>
-                <button class="aposta" data-valor="Salsicha">Salsicha</button>
-                <button class="aposta" data-valor="Pudim">Pudim</button>
-                <button class="aposta" data-valor="Bidu">Bidu</button>
-                <button class="aposta" data-valor="Doguinho">Doguinho</button>
-            </div>
+        <div class="controles">
+            <button id="btn-spin">Girar!</button>
         </div>
-        <div class="resultado-container">
-            <p id="mensagem"></p>
+        <div class="placar">
+            <p>Créditos: <span id="creditos">100</span></p>
+            <p id="mensagem-resultado"></p>
         </div>
     </div>
-
     <script>
-        const roleta = document.querySelector('.roleta');
-        const botoesAposta = document.querySelectorAll('.aposta');
-        const mensagem = document.getElementById('mensagem');
+        const colunas = document.querySelectorAll('.coluna');
+        const btnSpin = document.getElementById('btn-spin');
+        const creditosEl = document.getElementById('creditos');
+        const mensagemEl = document.getElementById('mensagem-resultado');
 
-        const itensRoleta = [
-            { nome: 'Caramelo', cor: '#e67e22' },
-            { nome: 'Vira-lata', cor: '#f1c40f' },
-            { nome: 'Salsicha', cor: '#c0392b' },
-            { nome: 'Pudim', cor: '#9b59b6' },
-            { nome: 'Bidu', cor: '#3498db' },
-            { nome: 'Doguinho', cor: '#2ecc71' }
+        let creditos = 100;
+
+        // Definição dos símbolos e seus valores de pagamento
+        const simbolos = [
+            { nome: 'Caramelo', img: 'caramelo.png', valor: 20 },
+            { nome: 'Osso', img: 'osso.png', valor: 10 },
+            { nome: 'Bolinha', img: 'bolinha.png', valor: 5 },
+            { nome: 'Coleira', img: 'coleira.png', valor: 3 },
+            { nome: 'Casinha', img: 'casinha.png', valor: 1 }
         ];
 
-        // Gera os itens da roleta no HTML
-        function gerarItensRoleta() {
-            roleta.innerHTML = '';
-            itensRoleta.forEach(item => {
+        // Gera e insere os símbolos nas colunas
+        function gerarSimbolos(colunaEl) {
+            colunaEl.innerHTML = '';
+            const simbolosParaGirar = [...simbolos, ...simbolos, ...simbolos, ...simbolos]; // Repete para o efeito de giro
+            simbolosParaGirar.sort(() => Math.random() - 0.5); // Embaralha a ordem
+
+            simbolosParaGirar.forEach(simbolo => {
                 const div = document.createElement('div');
-                div.className = 'roleta-item';
-                div.textContent = item.nome;
-                div.style.backgroundColor = item.cor;
-                roleta.appendChild(div);
+                div.className = 'simbolo';
+                const img = document.createElement('img');
+                img.src = `${simbolo.img}`; // Apenas o nome do arquivo se estiver na mesma pasta
+                img.alt = simbolo.nome;
+                div.appendChild(img);
+                colunaEl.appendChild(div);
             });
         }
 
-        // Lógica principal do jogo
-        function girarRoleta(aposta) {
-            // Desabilita os botões para evitar múltiplas apostas
-            botoesAposta.forEach(btn => btn.disabled = true);
-            
-            // Duplica os itens da roleta na memória para o giro
-            // e os insere no HTML antes de girar.
-            const itensParaGirar = [...itensRoleta, ...itensRoleta, ...itensRoleta];
-            
-            // Recria os itens na roleta para a animação
-            roleta.innerHTML = '';
-            itensParaGirar.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'roleta-item';
-                div.textContent = item.nome;
-                div.style.backgroundColor = item.cor;
-                roleta.appendChild(div);
+        // Atualiza a visualização dos créditos
+        function atualizarCreditos() {
+            creditosEl.textContent = creditos;
+        }
+
+        // Verifica se há uma combinação vencedora
+        function verificarVitoria() {
+            const simbolosResultantes = [];
+            colunas.forEach(coluna => {
+                // Pega o símbolo que parou no centro (índice 3 na nossa lista)
+                const simbolo = coluna.querySelector(`.simbolo:nth-child(4) img`).alt; 
+                simbolosResultantes.push(simbolo);
             });
 
-            // Escolhe um item aleatório para ser o resultado
-            const resultadoIndex = Math.floor(Math.random() * itensRoleta.length);
-            const resultado = itensRoleta[resultadoIndex];
+            const [s1, s2, s3] = simbolosResultantes;
             
-            // Calcula o deslocamento para o item vencedor
-            const deslocamento = (itensRoleta.length * 2 + resultadoIndex) * -300;
+            // Verifica a combinação
+            if (s1 === s2 && s2 === s3) {
+                // Combinação de três símbolos iguais
+                const simboloVencedor = simbolos.find(s => s.nome === s1);
+                const ganho = simboloVencedor.valor;
+                creditos += ganho;
+                mensagemEl.textContent = `Que sorte! Três ${s1}s! Você ganhou ${ganho} créditos.`;
+                mensagemEl.style.color = 'green';
+            } else {
+                mensagemEl.textContent = `Que pena, sem combinação. Tente de novo!`;
+                mensagemEl.style.color = '#c0392b';
+            }
+        }
+
+        // A função principal de giro
+        btnSpin.addEventListener('click', () => {
+            if (creditos <= 0) {
+                mensagemEl.textContent = 'Créditos insuficientes! Recarregue a página.';
+                return;
+            }
             
-            // Aplica a transição e a transformação para o giro
-            roleta.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
-            roleta.style.transform = `translateX(${deslocamento}px)`;
+            creditos -= 1; // Custo de cada giro
+            atualizarCreditos();
             
-            // Após o giro, exibe o resultado
+            btnSpin.disabled = true;
+            mensagemEl.textContent = 'Girando...';
+            mensagemEl.style.color = '#2c3e50';
+
+            colunas.forEach((coluna, index) => {
+                gerarSimbolos(coluna);
+                // Calcula o deslocamento para o giro
+                const deslocamento = -100 * (Math.floor(Math.random() * (simbolos.length - 1)) + simbolos.length * 3);
+                coluna.style.transform = `translateY(${deslocamento}px)`;
+            });
+
+            // Aguarda o giro terminar para verificar o resultado
             setTimeout(() => {
-                if (aposta === resultado.nome) {
-                    mensagem.textContent = `Parabéns! O caramelo parou em ${resultado.nome}. Você venceu!`;
-                    mensagem.style.color = 'green';
-                } else {
-                    mensagem.textContent = `Que pena! O caramelo parou em ${resultado.nome}. Tente novamente.`;
-                    mensagem.style.color = 'red';
-                }
-                
-                // Reseta a roleta e reabilita os botões
+                verificarVitoria();
+                btnSpin.disabled = false;
+                // Reseta as colunas para a posição inicial com o símbolo vencedor no centro
+                colunas.forEach(coluna => {
+                    coluna.style.transition = 'none';
+                    coluna.style.transform = 'translateY(0)';
+                });
+                // Reativa a transição para o próximo giro
                 setTimeout(() => {
-                    roleta.style.transition = 'none';
-                    roleta.style.transform = `translateX(0)`;
-                    gerarItensRoleta(); // Volta a roleta para a versão original
-                    botoesAposta.forEach(btn => btn.disabled = false);
-                }, 1000);
-            }, 4000);
-        }
-
-        // Adiciona o evento de clique nos botões de aposta
-        botoesAposta.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const aposta = btn.getAttribute('data-valor');
-                mensagem.textContent = `Você apostou em ${aposta}. Girando a roleta...`;
-                mensagem.style.color = '#2c3e50';
-                girarRoleta(aposta);
-            });
+                    colunas.forEach(coluna => {
+                        coluna.style.transition = 'transform 1.5s cubic-bezier(0.25, 0.1, 0.25, 1)';
+                    });
+                }, 50);
+            }, 1500); // tempo da animação
         });
 
-        // Inicializa a roleta ao carregar a página
-        document.addEventListener('DOMContentLoaded', gerarItensRoleta);
+        // Inicialização do jogo
+        document.addEventListener('DOMContentLoaded', () => {
+            colunas.forEach(gerarSimbolos);
+            atualizarCreditos();
+        });
     </script>
 </body>
 </html>
