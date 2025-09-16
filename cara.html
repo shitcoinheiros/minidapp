@@ -1,181 +1,202 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Vira-Lata Caramelo Runner</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: linear-gradient(to top, #87CEEB, #ffffff);
-      font-family: Arial, sans-serif;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roleta Vira-Lata</title>
+  <style>body {
+    background-color: #f0c38e;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
 
-    canvas {
-      display: block;
-      margin: auto;
-      background: #d2b48c;
-      border: 3px solid #000;
-    }
+.container {
+    text-align: center;
+    background-color: #fff;
+    padding: 2em;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-    #score {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      font-size: 22px;
-      font-weight: bold;
-      color: #222;
-      background: #fff;
-      padding: 6px 12px;
-      border-radius: 8px;
-      border: 2px solid #000;
-    }
-  </style>
+h1 {
+    color: #a0522d;
+}
+
+.roleta-container {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin: 2em auto;
+    border-radius: 50%;
+    border: 5px solid #a0522d;
+    overflow: hidden;
+}
+
+.roleta {
+    display: flex;
+    transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.roleta-item {
+    min-width: 100%;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.roleta-ponteiro {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 25px solid #a0522d;
+}
+
+.apostas {
+    margin-top: 1.5em;
+}
+
+.opcoes-aposta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.aposta {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    background-color: #e67e22;
+    color: #fff;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.aposta:hover {
+    background-color: #d35400;
+}
+
+#mensagem {
+    margin-top: 1.5em;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #2c3e50;
+}</style>
+
 </head>
 <body>
-  <div id="score">Pontos: 0</div>
-  <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <div class="container">
+        <h1>Roleta Vira-Lata</h1>
+        <div class="roleta-container">
+            <div class="roleta">
+                </div>
+            <div class="roleta-ponteiro"></div>
+        </div>
+        <div class="apostas">
+            <h2>Faça sua aposta!</h2>
+            <div class="opcoes-aposta">
+                <button class="aposta" data-valor="Caramelo">Caramelo</button>
+                <button class="aposta" data-valor="Vira-lata">Vira-lata</button>
+                <button class="aposta" data-valor="Salsicha">Salsicha</button>
+                <button class="aposta" data-valor="Pudim">Pudim</button>
+                <button class="aposta" data-valor="Bidu">Bidu</button>
+                <button class="aposta" data-valor="Doguinho">Doguinho</button>
+            </div>
+        </div>
+        <div class="resultado-container">
+            <p id="mensagem"></p>
+        </div>
+    </div>
 
-  <script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+    <script>const roleta = document.querySelector('.roleta');
+const botoesAposta = document.querySelectorAll('.aposta');
+const mensagem = document.getElementById('mensagem');
 
-    // ---- SPRITE DO CARAMEL0 ----
-    const sprite = new Image();
-    sprite.src =
-      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJAAAABACAYAAAD0u07/AAAEsElEQVR4nO3bP2sUQRjH8f8SSG8hoD1yqCGFZBEx+QeSgukSjqUp0t0lyhxgVg+2QiQfUEERQ9MCtIuIlHEgJeAI1sPCDBZqv7mve2d0zOzP77szcz+9svO3NmZn/OsXzdPB7Rr4q7wEc3XIoYyMWRdgMkBtQ2cApRHsJuECaJHQk8q0nIfWgk8L0KnU7G3wAkYrcz3jUDusUpwcYAJbA6Lvk5jaYAdghRoPvZqxA5j6Q3l0eCfwCuMc2m1gAi2nEKnYgV8ZlLEPRmsrJxB7YAt14P3BoC7AH7xGVtrH6nALH+Ap0sFZwA6pENLL8bD6z1k7ArsILmVgv8FgVkMslrYUyZqAWy3AHkOeQQaY9w+8iG1nOJPSbhs+AIpkeCPrIpu4NANvFODAH1GR5mu2mTwL9o6R6H3TFhLUPmAtzgY4QhmLsAbV4xDNjeOHkgXGmgm1l1Lnh5Dr2B4EMI+6KQz8Jwr1V8U1LO+oD3RCXoSkO2o0rvg7B7W+jH8Us9IC2ks9IO1z8X0Hw7XyIoa5h9cMJK4Av0AI9sBajTkA7zPu0gB5uIJixt0H9e5HOBeCMMZjSji2ApwM9kvzCfp5Afm1o4+3XgHj98BqMv0tqAPzF2O7UAP8Zn18BfU4mbV5bDvJ6AOs1qedg16Bi8nJZcnEHo5L0FQ4PE5zGEZlMnGnmD0nKiMnpCjwfpLrwfJIFZ6Y5zIoXwC5N+2Bk7GybzYZG1wWdk/LWAn+3lGAn5Y7jQDLsmF6j5C9AYR8FvjYtYQzPgmWzM7m8ep+fvwEKphE0PAeSjbwwGZSeCfUoU4uMK7+DJfArDNGeqQ9bnsEOn8LDPmVZn/wCqmxz+NPRs53FJ+MBZX8cbsTn6+d8P6TfzOp2AGVjLZh06ItYCVu0CvXwnMW3hSk+lY8gh9vIdUxdZm5DXOHbzwesKhfCP7XJMSOVL3kMgLta5KN02JeJ1N6v2KH3mT2bsZwmFWAnGr1AHnww2c/D3vKNje+TAjlwA2LZNYGLfwLdpNcbwFGdvDewpg5yCvU1R8gC6ylvY+UKdTboRdcgBdwDLX+PjALRFiOViAp4DPt5kNUsDK1+Veo9yDDZcT3tgH4u5HgFhX4mtntHZF+QPbfOXr1AhtkmcVOW5Ykk42NAcWW+lfncrV+XMHLG9pEmOL+jFkfdufkHYAf5BVGzN9cW8ac0oMJ/hqsrkxXUPAowk2w7ZFejPtLv6B2A7dKlmX6cHeCj2gXzg9ApL0hPo/VWZc4O3JmwbafgDi7A98YAA8n9RA3dcBTAAAAAElFTkSuQmCC";
+const itensRoleta = [
+    { nome: 'Caramelo', cor: '#e67e22' },
+    { nome: 'Vira-lata', cor: '#f1c40f' },
+    { nome: 'Salsicha', cor: '#c0392b' },
+    { nome: 'Pudim', cor: '#9b59b6' },
+    { nome: 'Bidu', cor: '#3498db' },
+    { nome: 'Doguinho', cor: '#2ecc71' }
+];
 
-    // ---- Vira-Lata Caramelo ----
-    const caramelo = {
-      x: 50,
-      y: 300,
-      width: 64,
-      height: 64,
-      dy: 0,
-      gravity: 0.8,
-      jumpPower: -12,
-      onGround: true
-    };
-
-    let frame = 0;
-
-    function drawCaramelo() {
-      let sx = frame * 64; // posição X do frame no sprite sheet
-      ctx.drawImage(sprite, sx, 0, 64, 64, caramelo.x, caramelo.y, caramelo.width, caramelo.height);
-    }
-
-    // ---- Ossos e obstáculos ----
-    let bones = [];
-    let obstacles = [];
-    let score = 0;
-    let gameSpeed = 3;
-
-    function drawBones() {
-      ctx.fillStyle = "white";
-      bones.forEach(bone => {
-        ctx.beginPath();
-        ctx.arc(bone.x, bone.y, bone.radius, 0, Math.PI * 2);
-        ctx.fill();
-      });
-    }
-
-    function drawObstacles() {
-      ctx.fillStyle = "black";
-      obstacles.forEach(obs => {
-        ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
-      });
-    }
-
-    function updateCaramelo() {
-      caramelo.y += caramelo.dy;
-      caramelo.dy += caramelo.gravity;
-
-      if (caramelo.y + caramelo.height >= canvas.height - 50) {
-        caramelo.y = canvas.height - 50 - caramelo.height;
-        caramelo.dy = 0;
-        caramelo.onGround = true;
-      }
-    }
-
-    function spawnBone() {
-      bones.push({ x: canvas.width, y: Math.random() * 200 + 100, radius: 10 });
-    }
-
-    function spawnObstacle() {
-      obstacles.push({
-        x: canvas.width,
-        y: canvas.height - 50,
-        width: 30,
-        height: 50
-      });
-    }
-
-    function updateBones() {
-      bones.forEach((bone, index) => {
-        bone.x -= gameSpeed;
-        if (bone.x < 0) bones.splice(index, 1);
-
-        if (
-          caramelo.x < bone.x + bone.radius &&
-          caramelo.x + caramelo.width > bone.x - bone.radius &&
-          caramelo.y < bone.y + bone.radius &&
-          caramelo.y + caramelo.height > bone.y - bone.radius
-        ) {
-          score++;
-          document.getElementById("score").innerText = "Pontos: " + score;
-          bones.splice(index, 1);
-        }
-      });
-    }
-
-    function updateObstacles() {
-      obstacles.forEach((obs, index) => {
-        obs.x -= gameSpeed;
-        if (obs.x < 0) obstacles.splice(index, 1);
-
-        if (
-          caramelo.x < obs.x + obs.width &&
-          caramelo.x + caramelo.width > obs.x &&
-          caramelo.y < obs.y + obs.height &&
-          caramelo.y + caramelo.height > obs.y
-        ) {
-          alert("Game Over! Pontos: " + score);
-          document.location.reload();
-        }
-      });
-    }
-
-    function gameLoop() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      drawCaramelo();
-      drawBones();
-      drawObstacles();
-
-      updateCaramelo();
-      updateBones();
-      updateObstacles();
-
-      requestAnimationFrame(gameLoop);
-    }
-
-    // ---- Animação do sprite ----
-    setInterval(() => {
-      frame = (frame + 1) % 4; // 4 frames
-    }, 150);
-
-    setInterval(spawnBone, 2000);
-    setInterval(spawnObstacle, 3000);
-
-    document.addEventListener("keydown", (e) => {
-      if (e.code === "Space" && caramelo.onGround) {
-        caramelo.dy = caramelo.jumpPower;
-        caramelo.onGround = false;
-      }
+// Gera os itens da roleta no HTML
+function gerarItensRoleta() {
+    roleta.innerHTML = '';
+    itensRoleta.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'roleta-item';
+        div.textContent = item.nome;
+        div.style.backgroundColor = item.cor;
+        roleta.appendChild(div);
     });
+}
 
-    gameLoop();
-  </script>
+// Lógica principal do jogo
+function girarRoleta(aposta) {
+    // Desabilita os botões para evitar múltiplas apostas
+    botoesAposta.forEach(btn => btn.disabled = true);
+    
+    // Duplica os itens para a roleta ter mais "giro"
+    const itensDuplicados = [...itensRoleta, ...itensRoleta, ...itensRoleta];
+    
+    // Escolhe um item aleatório para ser o resultado
+    const resultadoIndex = Math.floor(Math.random() * itensRoleta.length);
+    const resultado = itensRoleta[resultadoIndex];
+    
+    // Calcula o deslocamento para o item vencedor
+    const deslocamento = (itensRoleta.length * 2 + resultadoIndex) * -300; // 300px é a largura do item
+    
+    roleta.style.transform = `translateX(${deslocamento}px)`;
+    
+    // Após o giro, exibe o resultado
+    setTimeout(() => {
+        if (aposta === resultado.nome) {
+            mensagem.textContent = `Parabéns! O caramelo parou em ${resultado.nome}. Você venceu!`;
+            mensagem.style.color = 'green';
+        } else {
+            mensagem.textContent = `Que pena! O caramelo parou em ${resultado.nome}. Tente novamente.`;
+            mensagem.style.color = 'red';
+        }
+        
+        // Reseta a roleta e reabilita os botões
+        setTimeout(() => {
+            roleta.style.transition = 'none';
+            roleta.style.transform = `translateX(0)`;
+            gerarItensRoleta();
+            botoesAposta.forEach(btn => btn.disabled = false);
+        }, 1000); // tempo para o usuário ver o resultado
+        roleta.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
+    }, 4000); // 4s é o tempo da animação
+}
+
+// Adiciona o evento de clique nos botões de aposta
+botoesAposta.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const aposta = btn.getAttribute('data-valor');
+        mensagem.textContent = `Você apostou em ${aposta}. Girando a roleta...`;
+        mensagem.style.color = '#2c3e50';
+        girarRoleta(aposta);
+    });
+});
+
+// Inicializa a roleta ao carregar a página
+document.addEventListener('DOMContentLoaded', gerarItensRoleta);</script>
 </body>
 </html>
